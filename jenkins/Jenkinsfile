@@ -1,0 +1,60 @@
+pipeline {
+
+   agent any
+
+    parameters {
+        string(name: 'system_under_test', defaultValue: 'OptimusPrime', description: 'Name used as System Under Test in Perfana')
+        string(name: 'gatlingRepo', defaultValue: 'https://github.com/your/gatling-script.git', description: 'Gatling git repository')
+        // string(name: 'gatlingBranch', defaultValue: 'master', description: 'Gatling git repository branch')
+        choice(name: 'workload', choices: ['test-type-load', 'test-type-stress', 'test-type-slow-backend'], description: 'Workload profile to use in your Gatling script')
+        string(name: 'annotations', defaultValue: '', description: 'Add annotations to the test run, these will be displayed in Perfana')
+        string(name: 'targetBaseUrl', defaultValue: 'http://optimus-prime-fe:8080', description: 'Target Url')
+
+    }
+
+    stages {
+
+        stage('Checkout') {
+
+            steps {
+
+                script {
+
+                    git url: params.gatlingRepo, branch: "OptimusPrime-test"
+
+                }
+
+            }
+
+        }
+
+        stage('Run performance test') {
+
+            steps {
+
+                script {
+                    def perfanaUrl = "63f4cd97.perfana.cloud"
+                    def influxDbPassword = env.INFLUXDB_PASSWORD
+                    def elasticPassword = env.ELASTIC_PASSWORD
+                    def perfanaApiKey = env.PERFANA_API_KEY
+                    def testRunId = env.JOB_NAME + "-" + env.BUILD_NUMBER
+                    def version = "2.0." + env.BUILD_NUMBER
+                    def buildUrl = env.BUILD_URL
+
+                    // ** NOTE: This 'M3' maven tool must be configured
+                    // **       in the global configuration.
+
+                    def mvnHome = tool 'M3'
+
+                    withKubeConfig(caCertificate: 'LS0tLS1C... INSERT FULL CERT ...JTiS0tLQo=', clusterName: 'test', contextName: 'test', credentialsId: 'kubeconfig-test', namespace: 'test', serverUrl: 'https://w.x.y.z:port') {
+
+                        sh """
+                            ${mvnHome}/bin/mvn clean install -U events-gatling:test -Ptest-env-demo,${params.workload},assert-results -Dsut-config=optimus-prime  -DtestRunId=${testRunId} -DbuildResultsUrl=${buildUrl} -Dversion=${version} -DsystemUnderTest=${params.system_under_test} -Dannotations="${params.annotations}"  -DapiKey=${perfanaApiKey} -DtargetBaseUrl=http://optimus-prime-fe-afterburner:8080 -DinfluxUrl=https://influxdb.${perfanaUrl} -DinfluxUser=admin -DinfluxPassword=${influxDbPassword} -DelasticPassword=${elasticPassword} -DperfanaUrl=https://${perfanaUrl}
+                        """
+                    }
+                }
+            }
+        }
+
+    }
+}

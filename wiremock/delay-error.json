@@ -1,0 +1,14 @@
+{
+    "request": {
+        "method": "GET",
+        "url": "/delay"
+    },
+    "response": {
+        "status": ${status-code},
+        "body": "Hello world! from Wiremock, with delay :-)",
+        "fixedDelayMilliseconds": 100,
+        "headers": {
+            "Content-Type": "text/plain"
+        }
+    }
+}

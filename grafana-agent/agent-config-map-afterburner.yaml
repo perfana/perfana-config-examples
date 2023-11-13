@@ -1,0 +1,21 @@
+kind: ConfigMap
+metadata:
+  name: grafana-agent
+  namespace: agent
+apiVersion: v1
+data:
+  agent.yaml: |
+    metrics:
+      global:
+        scrape_interval: 60s
+        remote_write:
+          - url: http://perfana-secure-gateway.default.svc.cluster.local/mimir/api/v1/push
+      configs:
+        - name: agent
+          scrape_configs:
+          - job_name: "afterburner"
+            scrape_interval: 15s
+            honor_labels: true
+            metrics_path: /actuator/prometheus
+            static_configs:
+              - targets: ["afterburner.default.svc.cluster.local:80"]

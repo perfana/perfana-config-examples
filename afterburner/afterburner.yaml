@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: afterburner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: afterburner
+  template:
+    metadata:
+      labels:
+        app: afterburner
+    spec:
+      containers:
+      - name: afterburner
+        image: perfana/afterburner:2.3.0
+        ports:
+        - containerPort: 8080
+        env:
+          - name: spring.zipkin.enabled
+            value: "false"
+          - name: spring.zipkin.base-url
+            value: "https://tempo.63f4cd97.perfana.cloud/"
+          - name: spring.sleuth.sampler.probability
+            value: "1.0"
+          - name: spring.sleuth.propagation.tag.enabled
+            value: "true"
+          - name: spring.sleuth.keys.http.headers
+            value: "perfana-test-run-id,perfana-request-name"
+          - name: spring.sleuth.baggage.tag-fields
+            value: "perfana-test-run-id,perfana-request-name"
+          - name: spring.sleuth.baggage.remote-fields
+            value: "perfana-test-run-id,perfana-request-name"
+          - name: spring.sleuth.baggage-keys
+            value: "perfana-test-run-id,perfana-request-name"
+          - name: management.metrics.tags.system_under_test
+            value: "MyAfterburner"
+          - name: management.metrics.tags.perfana
+            value: "true"
+          - name: management.metrics.tags.test_environment
+            value: "default"
+          - name: management.metrics.tags.service
+            value: "afterburner-service"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: afterburner
+spec:
+  selector:
+    app: afterburner  # This selector should match the labels of your pods
+  ports:
+    - protocol: TCP
+      port: 80     # Port exposed by the Service
+      targetPort: 8080   # Port your container is listening on

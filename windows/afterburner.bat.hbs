@@ -1,0 +1,12 @@
+java ^
+-Dserver.port=8081 ^
+-Dspring.zipkin.enabled=false ^
+-Dspring.zipkin.base-url="{{jaegerUrl}}" ^
+-Dspring.sleuth.sampler.probability="1.0" ^
+-Dspring.sleuth.propagation.tag.enabled=true ^
+-Dspring.sleuth.keys.http.headers="{{bagageKeysHttpHeaders}}" ^
+-Dspring.sleuth.baggage.tag-fields="{{bagageKeysHttpHeaders}}" ^
+-Dspring.sleuth.baggage.remote-fields="{{bagageKeysHttpHeaders}}" ^
+-Dspring.sleuth.baggage-keys="{{bagageKeysHttpHeaders}}" ^{{#bagageKeys}}{{#entrySet}}
+-Dmanagement.metrics.tags.{{key}}="{{value}}" ^{{/entrySet}}{{/bagageKeys}} ^
+-jar c:\perfana\afterburner\afterburner-java\target\afterburner-java-2.2.0-SNAPSHOT-exec.jar
