@@ -6,16 +6,19 @@ Working directory is assumed to be: `c:\perfana`
 
 The java package zip is assumed to be unpacked in `c:\perfana\perfana-package`.
 
-First install Chocolatery.
+First install scoop.
 
 Next install needed packages:
 
 ```cmd
-choco install openjdk --version=17.0.2 [better via scoop?]
-choco install maven
-choco install nginx
-choco install git
-choco install gh
+scoop install git
+scoop install gh
+scoop install nginx
+scoop install maven
+scoop install java/openjdk
+scoop install kotlin
+scoop install extras/kscript
+scoop install unzip [optional]
 ```
 
 Next get `perfana-config-example` repo:
@@ -23,16 +26,6 @@ Next get `perfana-config-example` repo:
 ```cmd
 cd c:\perfana
 gh repo clone perfana/perfana-config-examples
-```
-
-First install scoop and kscript: https://github.com/kscripting/kscript#installation-on-windows
-
-```cmd
-scoop bucket add extras
-scoop install java/openjdk [optional]
-scoop install kotlin
-scoop install kscript
-scoop install unzip [optional]
 ```
 
 set env variables, create `setup.bat` and execute:
