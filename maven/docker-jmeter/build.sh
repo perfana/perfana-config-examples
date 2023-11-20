@@ -12,4 +12,4 @@ then
 fi
 chmod u+x files/j2i
 
-docker build -t my-maven-loadtest:v0.2 .
+docker build -t maven-jmeter-loadtest:v0.1 .

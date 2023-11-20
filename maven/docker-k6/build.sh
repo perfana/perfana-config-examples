@@ -12,4 +12,4 @@ then
 fi
 chmod u+x files/k2i
 
-docker build -t my-maven-loadtest:v0.2 .
+docker build -t maven-k6-loadtest:v0.1 .

@@ -12,4 +12,4 @@ then
     chmod u+x files/g2i
 fi
 
-docker build -t my-maven-loadtest:v0.2 .
+docker build -t maven-gatling-loadtest:v0.1 .

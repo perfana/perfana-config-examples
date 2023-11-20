@@ -2,16 +2,16 @@
 
 Run a load test and connect to Perfana via Maven.
 
-Generate a `pom.xml` for jMeter or Gatling.
+Generate a `pom.xml` for jMeter, K6 or Gatling.
 
 ## Docker image for jMeter
 
-Build a docker image for jMeter and Maven in the `docker-jmeter` directory.
+Build a docker image for jMeter and Maven in the `docker-jmeter` directory using `build.sh`.
 It builds an image with all needed files and config inside.
 
 Run in a cluster as:
 
-    kubectl run -it --rm --restart=Never --image my-maven-loadtest:v0.2 loadtest -- sh
+    kubectl run -it --rm --restart=Never --image maven-jmeter-loadtest:v0.1 loadtest -- sh
     
 At the shell command, type `mvn verify` to start the load test.
 Or replace `sh` with `mvn verify` to run directly.
@@ -28,8 +28,8 @@ export PERFANA_API_KEY=<perfana-api-key>
 export LOAD_TEST_TOOL=jmeter
 $PERFANA_CONFIG_EXAMPLES_DIR/template/transform.kts pom > files/pom.xml
 ./build.sh
-k3d image import my-maven-loadtest:v0.2 -c companyx
-kubectl run -it --rm --restart=Never --image my-maven-loadtest:v0.2 loadtest -- mvn verify
+k3d image import maven-jmeter-loadtest:v0.1 -c companyx
+kubectl run -it --rm --restart=Never --image maven-jmeter-loadtest:v0.1 loadtest -- mvn verify
 ```
 
 ## Docker image for Gatling
@@ -39,9 +39,20 @@ Gatling.
 
 Run in a cluster as:
 
-    kubectl run -it --rm --restart=Never --image my-maven-loadtest:v0.2 loadtest -- sh
+    kubectl run -it --rm --restart=Never --image maven-gatling-loadtest:v0.1 loadtest -- sh
 
 Start with `mvn events-gatling:test`.
+
+## Docker image for K6
+
+In the `docker-k6` directory a complete docker image can be build to run load tests with
+K6.
+
+Run in a cluster as:
+
+    kubectl run -it --rm --restart=Never --image maven-k6-loadtest:v0.1 loadtest -- sh
+
+Start with `mvn event-scheduler:test`.
 
 ### Steps
 
@@ -51,4 +62,4 @@ Same steps as the jMeter run, only change `LOAD_TEST_TOOL=jmeter` to `LOAD_TEST_
 
 For a k3d cluster, in this example called `companyx`, use this command to upload the image:
 
-   k3d image import my-maven-loadtest:v0.2 -c companyx
+   k3d image import maven-jmeter-loadtest:v0.1 -c companyx
