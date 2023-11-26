@@ -1,6 +1,11 @@
 # Gatling
 
-Add the Perfana test run id in the headers of the calls:
+The examples below are in Kotlin. You can also use Java or Scala.
+
+Add the Perfana test run id in the headers of the calls. Used for distributed tracing headers.
+
+The `targetBaseUrl` defines what the SUT URL is. E.g. `http://localhost:8080` for local run and `http://afterburner`
+for a run in a test cluster.
 
 ```kotlin
 private val testRunId = System.getProperty("testRunId") ?: "test-run-id-from-script-" + System.currentTimeMillis()
@@ -13,7 +18,6 @@ Add `perfana-test-run-id` header for all calls:
 ```kotlin
     val httpProtocol = http
     .baseUrl(baseUrl)
-    .inferHtmlResources()
     .acceptHeader("*/*")
     .contentTypeHeader(contentType)
     .userAgentHeader("curl/7.54.0")
@@ -28,4 +32,15 @@ Send the needed parameters to the script via the JVM arguments in the `<configur
     <jvmArg>-DtestRunId=${testRunId}</jvmArg>
     <jvmArg>-DtargetBaseUrl=${targetBaseUrl}</jvmArg>
 </jvmArgs>
+```
+
+Or use Java properties to set these values via `-D`. E.g. `-DtestRunId=my-test-run-id-123`.
+
+Add `perfana-request-name` header for each separate call. Used for distributed tracing headers.
+
+```kotlin
+.exec(http("simple_delay")
+.get("/delay?duration=222")
+.header("perfana-request-name", "simple_delay")
+.check(status().shouldBe(200)))
 ```
