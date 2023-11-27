@@ -36,6 +36,10 @@ data class PsgConfig(
     val certificate: String
 )
 
+data class OtelCollectorConfig(
+    val client: String,
+)
+
 data class SutConfig(
     val systemUnderTest: String,
     val testEnvironment: String,
@@ -98,7 +102,7 @@ data class K6Config(
 
 // --- concrete example ---
 
-val myClient: String = System.getenv("PERFANA_CLIENT") ?: "companyx"
+val myClient: String = System.getenv("PERFANA_CLIENT") ?: "acme"
 
 val perfanaGatewayHost: String = "perfana-secure-gateway"
 
@@ -121,8 +125,8 @@ val springBootConfig = SpringBootConfig(
 
 val sutConfig = SutConfig(
     systemUnderTest = "MyAfterburner",
-    testEnvironment = "default",
-    workload = "loadTest-${loadTestTool}",
+    testEnvironment = "default-${loadTestTool}",
+    workload = "loadTest",
     version = "v1.0.0",
     hostname = "afterburner",
     port = 80,
@@ -189,15 +193,15 @@ val handlebars = Handlebars(loader)
 
 if (command == "pom" || command == "all") {
     val templatePom = handlebars.compile("pom.xml")
-    println(templatePom.apply(perfanaConfig));
+    println(templatePom.apply(perfanaConfig))
 }
 
-if (command == "psg" || command == "all") {
-    val privateKeyFile = File(System.getenv("PSG_TLS_KEY") ?: "tls.key")
-    //println("privateKeyFile: $privateKeyFile")
-    val certificateFile = File(System.getenv("PSG_TLS_CRT") ?: "tls.crt")
-    //println("certificateFile: $certificateFile")
+val privateKeyFile = File(System.getenv("PSG_TLS_KEY") ?: "tls.key")
+//println("privateKeyFile: $privateKeyFile")
+val certificateFile = File(System.getenv("PSG_TLS_CRT") ?: "tls.crt")
+//println("certificateFile: $certificateFile")
 
+if (command == "psg" || command == "all") {
     val psgConfig = PsgConfig(
         psgHostname = perfanaGatewayHost,
         perfanaUrl = "https://${myClient}.perfana.cloud",
@@ -217,4 +221,13 @@ if (command == "metrics" || command == "all") {
 if (command == "afterburner" || command == "all") {
     val templateAfterburner = handlebars.compile("afterburner.yaml")
     println(templateAfterburner.apply(tracingConfig))
+}
+
+if (command == "otel-collector" || command == "all") {
+    val otelCollectorConfig = OtelCollectorConfig(
+        client = myClient,
+    )
+
+    val templateOtelCollector = handlebars.compile("otel-collector.yaml")
+    println(templateOtelCollector.apply(otelCollectorConfig))
 }

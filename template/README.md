@@ -17,14 +17,13 @@ To run from other dirs and, as example, generate a local `pom.xml`:
     export PERFANA_CONFIG_EXAMPLES_DIR=<path>
     $PERFANA_CONFIG_EXAMPLES_DIR/template/transform.kts pom > pom.xml
 
-
 ## env variables
 
 Set the following env variables before generating to override defaults:
 
 ```shell
 export PERFANA_CONFIG_EXAMPLES_DIR=<path>
-export PERFANA_CLIENT=mycompanyx
+export PERFANA_CLIENT=acme
 export TEMPLATE_DIR=$PERFANA_CONFIG_EXAMPLES_DIR/template
 export PERFANA_API_KEY=<perfana-api-key>
 export LOAD_TEST_TOOL=jmeter
@@ -44,5 +43,6 @@ Use the following arguments to control what is generated:
 * `pom` --- generates pom.xml
 * `psg` --- for values file perfana-secure-gateway
 * `metrics` --- for grafana-agent config
+* `otel-collector` --- kubernetes yaml for open telemetry collector
 * `afterburner` --- kubernetes yaml for Afterburner image
 * `all` --- generate all templates

@@ -22,13 +22,13 @@ To generate the pom.xml, package the image and run it in a k3d cluster:
 
 ```sh
 export PERFANA_CONFIG_EXAMPLES_DIR=<path>
-export PERFANA_CLIENT=mycompanyx
+export PERFANA_CLIENT=acme
 export TEMPLATE_DIR=$PERFANA_CONFIG_EXAMPLES_DIR/template
 export PERFANA_API_KEY=<perfana-api-key>
 export LOAD_TEST_TOOL=jmeter
 $PERFANA_CONFIG_EXAMPLES_DIR/template/transform.kts pom > files/pom.xml
 ./build.sh
-k3d image import maven-jmeter-loadtest:v0.1 -c companyx
+k3d image import maven-jmeter-loadtest:v0.1 -c acme
 kubectl run -it --rm --restart=Never --image maven-jmeter-loadtest:v0.1 loadtest -- mvn verify
 ```
 
@@ -60,6 +60,6 @@ Same steps as the jMeter run, only change `LOAD_TEST_TOOL=jmeter` to `LOAD_TEST_
 
 ## Upload image into cluster
 
-For a k3d cluster, in this example called `companyx`, use this command to upload the image:
+For a k3d cluster, in this example called `acme`, use this command to upload the image:
 
-   k3d image import maven-jmeter-loadtest:v0.1 -c companyx
+   k3d image import maven-jmeter-loadtest:v0.1 -c acme

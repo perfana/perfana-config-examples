@@ -6,7 +6,7 @@ Use an Open Telemetry agent to send traces and metrics.
 
 For Java applications, place the otel agent jar on the classpath.
 
-See example Kubernetes patch `ole-patch.yaml` that download the jar via an initcontainer and
+See example Kubernetes patch `otel-patch.yaml` that downloads the jar via an initcontainer and
 places it on the startup command.
 
 Use via:

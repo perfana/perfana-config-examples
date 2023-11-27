@@ -10,7 +10,10 @@ image:
 
 replicaCount: 1
 
-# The URL to connect to Perfana Cloud.
+# The Perfana domain belonging to client, e.g. acme.perfana.cloud.
+perfanaClientDomain: {{ TODO }}
+
+# The URL to connect to Perfana Cloud (for helm version below 1.18)
 perfanaURL: {{perfanaUrl}}
 
 # basicAuth is optional and used for authentication from client components to PAP.
@@ -110,7 +113,7 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: {{psgHostname}}.local
+    - host: {{ psgHostname }}.local
       paths:
         - path: /
           pathType: ImplementationSpecific
@@ -131,4 +134,3 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-

@@ -32,7 +32,7 @@ set env variables, create `setup.bat` and execute:
 
 ```cmd
 set PERFANA_CONFIG_EXAMPLES_DIR=c:\perfana\perfana-config-examples
-set PERFANA_CLIENT=mycompanyx
+set PERFANA_CLIENT=acme
 set TEMPLATE_DIR=%PERFANA_CONFIG_EXAMPLES_DIR%\template
 set PERFANA_API_KEY=<perfana-api-key>
 set LOAD_TEST_TOOL=gatling
