@@ -45,4 +45,5 @@ Use the following arguments to control what is generated:
 * `metrics` --- for grafana-agent config
 * `otel-collector` --- kubernetes yaml for open telemetry collector
 * `afterburner` --- kubernetes yaml for Afterburner image
+* `start` --- shell script to start local cluster
 * `all` --- generate all templates

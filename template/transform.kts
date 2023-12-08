@@ -31,6 +31,7 @@ enum class cicdPlatform {
 
 data class PsgConfig(
     val psgHostname: String,
+    val perfanaClientDomain: String,
     val perfanaUrl: String,
     val privateKey: String,
     val certificate: String
@@ -97,6 +98,10 @@ data class GatlingConfig(
 data class K6Config(
     val startRate: Int,
     val targetRate: Int
+)
+
+data class StartShConfig(
+    val client: String,
 )
 
 
@@ -202,9 +207,11 @@ val certificateFile = File(System.getenv("PSG_TLS_CRT") ?: "tls.crt")
 //println("certificateFile: $certificateFile")
 
 if (command == "psg" || command == "all") {
+    val perfanaDomain = "${myClient}.perfana.cloud"
     val psgConfig = PsgConfig(
         psgHostname = perfanaGatewayHost,
-        perfanaUrl = "https://${myClient}.perfana.cloud",
+        perfanaClientDomain = perfanaDomain,
+        perfanaUrl = "https://${perfanaDomain}",
         privateKey = privateKeyFile.readLines().joinToString(separator = "\n", transform = { "      " + it }),
         certificate = certificateFile.readLines().joinToString(separator = "\n", transform = { "      " + it })
     )
@@ -230,4 +237,18 @@ if (command == "otel-collector" || command == "all") {
 
     val templateOtelCollector = handlebars.compile("otel-collector.yaml")
     println(templateOtelCollector.apply(otelCollectorConfig))
+}
+
+val startShConfig = StartShConfig(
+    client = myClient,
+)
+
+if (command == "start" || command == "all") {
+    val templateStartSh = handlebars.compile("start-cluster.sh")
+    println(templateStartSh.apply(startShConfig))
+}
+
+if (command == "stop" || command == "all") {
+    val templateStopSh = handlebars.compile("stop-cluster.sh")
+    println(templateStopSh.apply(startShConfig))
 }

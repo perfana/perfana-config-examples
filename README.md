@@ -49,11 +49,11 @@ Steps to start:
 3. generate config from templates
 4. apply the config to the cluster
 
-To run a load test you can build the docker container in `maven/docker`.
+To run a load test you can build the docker container in `maven/docker-$LOADTEST`.
 Use the `build.sh` to create a local image.
 
 To run in the cluster:
 
-    k3d image import my-maven-loadtest:v0.2 -c acme
-    kubectl run -it --rm --restart=Never --image maven-gatling-loadtest:v0.1 loadtest -- mvn verify
+    k3d image import maven-gatling-loadtest:v0.1 -c acme
+    kubectl run -it --rm --restart=Never --image maven-gatling-loadtest:v0.1 loadtest -- mvn events-gatling:test
 

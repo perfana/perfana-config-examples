@@ -10,11 +10,11 @@ image:
 
 replicaCount: 1
 
-# The Perfana domain belonging to client, e.g. acme.perfana.cloud.
-perfanaClientDomain: {{ TODO }}
+# The Perfana domain belonging to client, e.g. acme.perfana.cloud (for helm version above 1.18)
+perfanaClientDomain: {{ perfanaClientDomain }}
 
 # The URL to connect to Perfana Cloud (for helm version below 1.18)
-perfanaURL: {{perfanaUrl}}
+perfanaURL: {{ perfanaUrl }}
 
 # basicAuth is optional and used for authentication from client components to PAP.
 basicAuth:
