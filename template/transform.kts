@@ -3,7 +3,6 @@
 @file:DependsOn("com.github.jknack:handlebars:4.3.1")
 
 import com.github.jknack.handlebars.Handlebars
-import com.github.jknack.handlebars.Template
 import com.github.jknack.handlebars.io.FileTemplateLoader
 import java.io.File
 
@@ -104,6 +103,11 @@ data class StartShConfig(
     val client: String,
 )
 
+data class LoadTestConfig(
+    val loadTestTool: LoadTestTool,
+    val imageTag: String,
+)
+
 
 // --- concrete example ---
 
@@ -141,7 +145,7 @@ val sutConfig = SutConfig(
 val baggageHeaderList = listOf("perfana-test-run-id", "perfana-request-name")
 
 val tracingConfig = TracingConfig(
-    jaegerUrl = "https://jaeger-collector-${myClient}.demo.perfana.cloud/",
+    jaegerUrl = "http://otel-collector:9411/",
     bagageKeysHttpHeadersList = baggageHeaderList,
     bagageKeysHttpHeaders = baggageHeaderList.joinToString(","),
     bagageKeys = mapOf(
@@ -221,8 +225,8 @@ if (command == "psg" || command == "all") {
 }
 
 if (command == "metrics" || command == "all") {
-    val templateScrape = handlebars.compile("scrape.yaml")
-    println(templateScrape.apply(perfanaConfig))
+    val templateAgent = handlebars.compile("grafana-agent.yaml")
+    println(templateAgent.apply(perfanaConfig))
 }
 
 if (command == "afterburner" || command == "all") {
@@ -237,6 +241,16 @@ if (command == "otel-collector" || command == "all") {
 
     val templateOtelCollector = handlebars.compile("otel-collector.yaml")
     println(templateOtelCollector.apply(otelCollectorConfig))
+}
+
+if (command == "loadtest" || command == "all") {
+
+    val loadTestConfig =  LoadTestConfig(
+        loadTestTool = loadTestTool,
+        imageTag = "0.0.2"
+    )
+    val templateLoadTest = handlebars.compile("loadtest.yaml")
+    println(templateLoadTest.apply(loadTestConfig))
 }
 
 val startShConfig = StartShConfig(

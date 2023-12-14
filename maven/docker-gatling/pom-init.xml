@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>perfana.io</groupId>
+    <artifactId>gatling-afterburner</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+
+    
+
+    <properties>
+
+        <encoding>UTF-8</encoding>
+
+        <!-- dependency versioning -->
+        
+        <events-gatling-maven-plugin.version>4.6.0-events-1</events-gatling-maven-plugin.version>
+        <gatling.version>3.9.5</gatling.version>
+        <kotlin.version>1.9.10</kotlin.version>
+        <scala-maven-plugin.version>4.8.0</scala-maven-plugin.version>
+        
+        <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
+        <test-events-wiremock.version>[3.0.0,3.1.0)</test-events-wiremock.version>
+        <test-events-springboot.version>[3.0.0,3.1.0)</test-events-springboot.version>
+        <test-events-test-run-config-command.version>[3.0.0,3.1.0)</test-events-test-run-config-command.version>
+        <test-events-command-runner.version>[3.0.0,3.1.0)</test-events-command-runner.version>
+
+    	<perfanaUrl>http://perfana-secure-gateway/</perfanaUrl>
+
+        <!-- By default debug mode is off -->
+        <debug>false</debug>
+
+        <!-- By default assert test results -->
+        <assertResultsEnabled>true</assertResultsEnabled>
+
+        <!-- By default send data to perfana -->
+        <perfanaEnabled>true</perfanaEnabled>
+
+        <!-- By default disable wiremock -->
+        <wiremockEnabled>false</wiremockEnabled>
+        <wiremockUrl>http://wiremock:8080</wiremockUrl>
+
+        <!-- By default enable events -->
+        <eventsEnabled>true</eventsEnabled>
+
+	    <!-- Add event scheduler script here -->
+	    <eventScheduleScript></eventScheduleScript>
+
+        <!-- Default load settings -->
+        <initialUsersPerSecond>1</initialUsersPerSecond>
+        <targetConcurrency>1</targetConcurrency>
+        <rampupTimeInSeconds>30</rampupTimeInSeconds>
+        <constantLoadTimeInSeconds>90</constantLoadTimeInSeconds>
+
+        <!-- Settings for the Perfana test runs -->
+    	<systemUnderTest>MyAfterburner</systemUnderTest>
+        <version>v1.0.0</version>
+        <tags>gatling,spring-boot-kubernetes</tags>
+        <apiKey>${ENV.PERFANA_API_KEY}</apiKey>
+        <influxUrl>http://perfana-secure-gateway/influxdb</influxUrl>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.gatling.highcharts</groupId>
+            <artifactId>gatling-charts-highcharts</artifactId>
+            <version>${gatling.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.10</version>
+                <executions>
+                    <execution>
+                        <id>timestamp-property</id>
+                        <goals>
+                            <goal>timestamp-property</goal>
+                        </goals>
+                        <configuration>
+                            <name>build.time</name>
+                            <pattern>yyyyMMdd-HHmmss</pattern>
+                            <timeZone>CET</timeZone>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.perfana</groupId>
+                <artifactId>events-gatling-maven-plugin</artifactId>
+                <version>${events-gatling-maven-plugin.version}</version>
+                <configuration>
+                    <simulationClass>afterburner.AfterburnerBasicSimulation</simulationClass>
+                    <jvmArgs>
+                        <!-- test run id will be overridden with Perfana generated testRunId which is enabled by default -->
+                        <jvmArg>-DtestRunId=${testRunId}</jvmArg>
+                        <jvmArg>-DtargetBaseUrl=http://afterburner:80</jvmArg>
+                        <jvmArg>-DinitialUsersPerSecond=${initialUsersPerSecond}</jvmArg>
+                        <jvmArg>-DtargetConcurrency=${targetConcurrency}</jvmArg>
+                        <jvmArg>-DrampupTimeInSeconds=${rampupTimeInSeconds}</jvmArg>
+                        <jvmArg>-DconstantLoadTimeInSeconds=${constantLoadTimeInSeconds}</jvmArg>
+                    </jvmArgs>
+                    <eventSchedulerConfig>
+                        <debugEnabled>${debug}</debugEnabled>
+                        <schedulerEnabled>${eventsEnabled}</schedulerEnabled>
+                        <scheduleScript>
+                            ${eventScheduleScript}
+                        </scheduleScript>
+                        <testConfig>
+                            <systemUnderTest>${systemUnderTest}</systemUnderTest>
+                            <version>${version}</version>
+                            <workload>${workload}</workload>
+                            <testEnvironment>${testEnvironment}</testEnvironment>
+                            <testRunId>${testRunId}</testRunId>
+                            <buildResultsUrl>${buildResultsUrl}</buildResultsUrl>
+                            <rampupTimeInSeconds>${rampupTimeInSeconds}</rampupTimeInSeconds>
+                            <constantLoadTimeInSeconds>${constantLoadTimeInSeconds}</constantLoadTimeInSeconds>
+                            <annotations>${annotations}</annotations>
+                            <tags>${tags}</tags>
+                        </testConfig>
+                        <eventConfigs>
+                            <eventConfig implementation="io.perfana.event.PerfanaEventConfig">
+                                <name>PerfanaEvent</name>
+                                <enabled>${perfanaEnabled}</enabled>
+                                <perfanaUrl>${perfanaUrl}</perfanaUrl>
+                                <apiKey>${apiKey}</apiKey>
+                                <assertResultsEnabled>${assertResultsEnabled}</assertResultsEnabled>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
+                                <name>CommandRunnerGatlingToInflux</name>
+                                <onStartTest>sh -c "./g2i target/gatling --stop-timeout 120 -a ${influxUrl} -u ${influxUser} -p ${influxPassword} -b companyx_gatling3 -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
+                                <name>ActuatorEventFrontend</name>
+                                <tags>afterburner</tags>
+                                <actuatorBaseUrl>http://afterburner:80/actuator</actuatorBaseUrl>
+                                <actuatorEnvProperties>
+                                    java.runtime.version,
+                                    JDK_JAVA_OPTIONS,
+                                    afterburner.async_core_pool_size,
+                                    featureToggleIdentityMatrix,
+                                    afterburner.remote.call.httpclient.connections.max
+                                </actuatorEnvProperties>
+                            </eventConfig>
+                        </eventConfigs>
+                    </eventSchedulerConfig>
+                    
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>perfana-java-client</artifactId>
+                        <version>${perfana-java-client.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>test-events-springboot</artifactId>
+                        <version>${test-events-springboot.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>test-events-test-run-config-command</artifactId>
+                        <version>${test-events-test-run-config-command.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>test-events-command-runner</artifactId>
+                        <version>${test-events-command-runner.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>test-events-wiremock</artifactId>
+                        <version>${test-events-wiremock.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <source>src/test/kotlin</source>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jvmTarget>1.8</jvmTarget>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <profiles>
+
+	    <!-- environment profiles -->
+        <profile>
+            <id>test-env-default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <testEnvironment>default-gatling</testEnvironment>
+            </properties>
+        </profile>
+
+	    <!-- test type profiles -->
+        <profile>
+            <id>test-type-load</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <workload>loadTest</workload>
+                <initialUsersPerSecond>1</initialUsersPerSecond>
+                <targetConcurrency>15</targetConcurrency>
+                <rampupTimeInSeconds>20</rampupTimeInSeconds>
+                <constantLoadTimeInSeconds>120</constantLoadTimeInSeconds>
+            </properties>
+        </profile>
+
+    </profiles>
+</project>
+

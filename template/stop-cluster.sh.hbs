@@ -33,6 +33,11 @@ kubectl delete -f otel-collector-gen.yaml
 echo "Delete Grafana Agent"
 kubectl delete -f grafana-agent.yaml
 
+echo "Delete loadtest container"
+kubectl delete -f loadtest.yaml
+kubectl delete configmaps loadtest-gatling.tar.gz
+kubectl delete configmaps pom.xml
+
 echo "Remove perfana-secure-gateway"
 helm uninstall perfana-secure-gateway
 

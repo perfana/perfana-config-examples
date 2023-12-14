@@ -40,6 +40,11 @@ kubectl apply -f otel-collector-gen.yaml
 echo "Start Grafana Agent"
 kubectl apply -f grafana-agent.yaml
 
+echo "Start loadtest container"
+kubectl create configmap loadtest-gatling.tar.gz --from-file=loadtest-gatling.tar.gz
+kubectl create configmap pom.xml --from-file=pom.xml
+kubectl apply -f loadtest.yaml
+
 echo "Start perfana-secure-gateway"
 helm_repo_name="perfana"
 
@@ -52,7 +57,7 @@ else
     helm repo add $helm_repo_name https://$helm_repo_name.github.io/helm-charts
 fi
 
-helm install perfana-secure-gateway perfana/perfana-secure-gateway --version 0.1.19 --values psg-values.yaml
+helm install perfana-secure-gateway perfana/perfana-secure-gateway --version 0.1.21 --values psg-values.yaml
 
 echo "Wait for perfana-secure-gateway to be ready"
 sleep 15
@@ -72,4 +77,7 @@ helm test perfana-secure-gateway
 
 trap - ERR
 
-echo "Now you can run a test using the pom.xml in this directory"
+echo ""
+echo "Now you can run a test using:"
+echo "export KUBECONFIG=\"$KUBECONFIG\""
+echo "kubectl exec -it deploy/loadtest -- mvn events-gatling:test"
