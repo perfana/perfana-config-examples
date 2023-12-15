@@ -19,7 +19,7 @@ spec:
         - containerPort: 8080
         env:
           - name: spring.zipkin.enabled
-            value: "false"
+            value: "true"
           - name: spring.zipkin.base-url
             value: "https://tempo.63f4cd97.perfana.cloud/"
           - name: spring.sleuth.sampler.probability
