@@ -8,7 +8,10 @@ Use these variables:
 * SERVER_NAME - `${__P(test.server_name,MyAfterburner)}`
 * TEST_RUN_ID - `${__P(test.testRunId,debug)}`
 
-Then use the TEST_RUN_ID in the headers to be used in distibuted traces queries:
+The `test.testRunId` is automatically set with the auto generated Perfana test run id when
+running via the Perfana extended JMeter Maven plugin.
+
+Use the TEST_RUN_ID in the headers to be used in distributed traces queries:
 
 ```xml
 <elementProp name="" elementType="Header">

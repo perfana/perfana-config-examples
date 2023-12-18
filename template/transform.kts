@@ -101,6 +101,8 @@ data class K6Config(
 
 data class StartShConfig(
     val client: String,
+    val loadTestTool: LoadTestTool,
+    val loadTestToolMavenCommand: String,
 )
 
 data class LoadTestConfig(
@@ -255,6 +257,13 @@ if (command == "loadtest" || command == "all") {
 
 val startShConfig = StartShConfig(
     client = myClient,
+    loadTestTool = loadTestTool,
+    loadTestToolMavenCommand = when (loadTestTool) {
+        LoadTestTool.jmeter -> "mvn verify"
+        LoadTestTool.gatling -> "mvn events-gatling:test"
+        LoadTestTool.k6 -> "mvn event-scheduler:test"
+        else -> throw Exception("Unsupported loadTestTool: $loadTestTool")
+    }
 )
 
 if (command == "start" || command == "all") {

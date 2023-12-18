@@ -122,12 +122,12 @@
         <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <stringProp name="TargetLevel">${__P(test.targetConcurrency,50)}</stringProp>
-        <stringProp name="RampUp">${__groovy(ctx.getProperties().get(&quot;test.rampUp&quot;) == null ? 3 : Integer.valueOf(ctx.getProperties().get(&quot;test.rampUp&quot;)) / 60)}</stringProp>
+        <stringProp name="RampUp">${__P(test.rampUp, 30)}</stringProp>
         <stringProp name="Steps"></stringProp>
-        <stringProp name="Hold">${__groovy(ctx.getProperties().get(&quot;test.duration&quot;) == null ? 7 : Integer.valueOf(ctx.getProperties().get(&quot;test.duration&quot;)) / 60)}</stringProp>
+        <stringProp name="Hold">${__P(test.duration, 120)}</stringProp>
         <stringProp name="LogFilename"></stringProp>
         <stringProp name="Iterations"></stringProp>
-        <stringProp name="Unit">M</stringProp>
+        <stringProp name="Unit">S</stringProp>
       </com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup>
       <hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="simple_delay" enabled="true">

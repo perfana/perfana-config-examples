@@ -35,7 +35,7 @@ kubectl delete -f grafana-agent.yaml
 
 echo "Delete loadtest container"
 kubectl delete -f loadtest.yaml
-kubectl delete configmaps loadtest-gatling.tar.gz
+kubectl delete configmaps loadtest-{{ loadTestTool }}.tar.gz
 kubectl delete configmaps pom.xml
 
 echo "Remove perfana-secure-gateway"

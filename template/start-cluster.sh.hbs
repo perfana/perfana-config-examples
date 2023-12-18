@@ -41,7 +41,7 @@ echo "Start Grafana Agent"
 kubectl apply -f grafana-agent.yaml
 
 echo "Start loadtest container"
-kubectl create configmap loadtest-gatling.tar.gz --from-file=loadtest-gatling.tar.gz
+kubectl create configmap loadtest-{{ loadTestTool }}.tar.gz --from-file=loadtest-{{ loadTestTool }}.tar.gz
 kubectl create configmap pom.xml --from-file=pom.xml
 kubectl apply -f loadtest.yaml
 
@@ -60,7 +60,7 @@ fi
 helm install perfana-secure-gateway perfana/perfana-secure-gateway --version 0.1.21 --values psg-values.yaml
 
 echo "Wait for perfana-secure-gateway to be ready"
-sleep 15
+sleep 20
 
 # Custom function to handle errors
 handle_helm_error() {
@@ -80,4 +80,4 @@ trap - ERR
 echo ""
 echo "Now you can run a test using:"
 echo "export KUBECONFIG=\"$KUBECONFIG\""
-echo "kubectl exec -it deploy/loadtest -- mvn events-gatling:test"
+echo "kubectl exec -it deploy/loadtest -- {{ loadTestToolMavenCommand }}"
