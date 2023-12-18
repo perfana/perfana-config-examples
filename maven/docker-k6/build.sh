@@ -1,15 +1,17 @@
 #!/bin/bash
 
-if [ ! -f files/pom.xml ]
-then
-    echo "Generate pom.xml for a k6  run first, check README.md"
-    exit 1
+set -o errexit
+
+VERSION="0.0.2"
+
+# use "local" or "remote" as first parameter to build locally or push to docker hub
+local_or_remote="${1:-local}"
+
+if [ "$local_or_remote" == "remote" ]; then
+    echo "Building for docker hub."
+    docker buildx build --platform linux/amd64,linux/arm64 -t perfana/maven-k6-loadtest:$VERSION --push .
+else
+    echo "Building locally."
+    docker build -t perfana/maven-k6-loadtest:$VERSION-SNAPSHOT .
 fi
 
-if [ ! -f files/k2i ] 
-then
-    wget -O files/k2i -q "https://github.com/perfana/gatling-to-influxdb/releases/download/k2i-0.0.1/k2i"
-fi
-chmod u+x files/k2i
-
-docker build -t maven-k6-loadtest:v0.1 .
