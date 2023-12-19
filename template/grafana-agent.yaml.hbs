@@ -1,18 +1,14 @@
 apiVersion: v1
-kind: Namespace
-metadata:
-  name: agent
----
-apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: grafana-agent
-  namespace: agent
+  namespace: perfana-starter
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: grafana-agent
+  namespace: perfana-starter
 rules:
 - apiGroups:
   - ""
@@ -36,6 +32,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: grafana-agent
+  namespace: perfana-starter
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -51,7 +48,7 @@ metadata:
   labels:
     name: grafana-agent
   name: grafana-agent
-  namespace: agent
+  namespace: perfana-starter
 spec:
   clusterIP: None
   ports:
@@ -65,7 +62,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: grafana-agent
-  namespace: agent
+  namespace: perfana-starter
 spec:
   replicas: 1
   selector:
@@ -123,14 +120,14 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: grafana-agent
-  namespace: agent
+  namespace: perfana-starter
 data:
   agent.yaml: |
     metrics:
       global:
         scrape_interval: 60s
         remote_write:
-          - url: http://perfana-secure-gateway.default.svc.cluster.local/mimir/api/v1/push
+          - url: http://perfana-secure-gateway.perfana-starter.svc.cluster.local/mimir/api/v1/push
       configs:
         - name: agent
           scrape_configs:
@@ -139,4 +136,4 @@ data:
             honor_labels: true
             metrics_path: /actuator/prometheus
             static_configs:
-              - targets: ["afterburner.default.svc.cluster.local:80"]
+              - targets: ["afterburner.perfana-starter.svc.cluster.local:80"]

@@ -23,6 +23,7 @@ if ! command -v helm &> /dev/null; then
 fi
 
 export KUBECONFIG="$(k3d kubeconfig write $client_name)"
+kubectl config set-context --current --namespace=perfana-starter
 
 echo "Remove Afterburner SUT"
 kubectl delete -f afterburner.yaml
@@ -40,6 +41,9 @@ kubectl delete configmaps pom.xml
 
 echo "Remove perfana-secure-gateway"
 helm uninstall perfana-secure-gateway
+
+echo "Remove perfana-starter namespace"
+kubectl delete namespace perfana-starter
 
 if k3d cluster list | grep -q "$client_name"; then
     echo "Cluster $client_name is available."

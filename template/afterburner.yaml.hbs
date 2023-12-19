@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: afterburner
+  namespace: perfana-starter
 spec:
   replicas: 1
   selector:
@@ -41,6 +42,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: afterburner
+  namespace: perfana-starter
 spec:
   selector:
     app: afterburner  # This selector should match the labels of your pods

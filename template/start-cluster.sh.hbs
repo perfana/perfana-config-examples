@@ -31,6 +31,10 @@ fi
 
 export KUBECONFIG="$(k3d kubeconfig write $client_name)"
 
+echo "Create perfana-starter namespace"
+kubectl create namespace perfana-starter
+kubectl config set-context --current --namespace=perfana-starter
+
 echo "Create afterburner SUT"
 kubectl apply -f afterburner.yaml
 
@@ -57,10 +61,10 @@ else
     helm repo add $helm_repo_name https://$helm_repo_name.github.io/helm-charts
 fi
 
-helm install perfana-secure-gateway perfana/perfana-secure-gateway --version 0.1.21 --values psg-values.yaml
+helm install --namespace=perfana-starter perfana-secure-gateway perfana/perfana-secure-gateway --version 0.1.21 --values psg-values.yaml
 
 echo "Wait for perfana-secure-gateway to be ready"
-sleep 20
+kubectl wait deployment perfana-secure-gateway --for condition=Available=True --timeout=120s
 
 # Custom function to handle errors
 handle_helm_error() {

@@ -27,7 +27,7 @@ if ((helm repo list) -contains $helmRepoName) {
 helm install perfana-secure-gateway perfana/perfana-secure-gateway --version 0.1.21 --values psg-values.yaml
 
 Write-Host "Wait for perfana-secure-gateway to be ready"
-Start-Sleep -Seconds 15
+kubectl wait deployment perfana-secure-gateway --for condition=Available=True --timeout=120s
 
 # Custom function to handle errors
 function HandleHelmError {
