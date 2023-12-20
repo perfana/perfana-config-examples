@@ -44,7 +44,7 @@ First approach is a local SUT and load test that connect to Perfana cloud.
 
 Steps to start:
 
-1. install k3d
+1. install [k3d](https://k3d.io/)
 2. create acme cluster 
 3. generate config from templates
 4. apply the config to the cluster
