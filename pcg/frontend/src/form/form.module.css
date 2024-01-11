@@ -1,5 +1,10 @@
-
 .container {
-    margin: auto;
-    max-width: 800px;
+    display: flex;
+}
+.button {
+    margin-top: 1rem;
+    background: #222a56;
+}
+.spinnerContainer {
+    display: flex;
 }
