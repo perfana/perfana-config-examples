@@ -94,7 +94,4 @@ class PerfanaConfigGeneratorController(val storage: FileStorage) {
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=$projectId.zip")
             .body(resource)
     }
-    /*
-
-     */
 }
