@@ -1,9 +1,9 @@
-import {Button, Input, Radio, Space, Spin, Typography} from "antd";
+import {Button, Input, Radio, Space, Spin, Tooltip, Typography} from "antd";
 import {useState} from "react";
 import styles from "./form.module.css";
 import axios from "axios";
 import JSZip from "jszip";
-import { LoadingOutlined } from '@ant-design/icons';
+import {InfoCircleOutlined, LoadingOutlined} from '@ant-design/icons';
 
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -15,7 +15,8 @@ export const Form = () =>{
     const [publicKeyCertificate, setPublicKeyCertificate] = useState('');
     const [privateKey, setPrivateKey] = useState('');
     const [testToolIndex, setTestToolIndex] = useState(0);
-    const [valid, isValid] = useState(false);
+    const [isPerfanaClientValid, setIsPerfanaClientValid] = useState(false);
+    const [isPerfanaAPIKeyValid, setIsPerfanaAPIKeyValid] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
     const TEST_TOOLS = [
@@ -27,14 +28,15 @@ export const Form = () =>{
     ]
 
 
-    const onChange = (e) => {
+    const onTestToolChangeHandler = (e) => {
         setTestToolIndex(e.target.value);
     };
     const setPerfanaClientHandler = (e) => {
-        isValid(e.target.value?.length >0)
+        setIsPerfanaClientValid(e.target.value?.length >4)
         setPerfanaClient(e.target.value)
     }
     const setPerfanaAPIKeyHandler = (e) => {
+        setIsPerfanaAPIKeyValid(e.target.value?.length >8)
         setPerfanaAPIKey(e.target.value)
     }
     const onClick = async () =>{
@@ -67,13 +69,17 @@ export const Form = () =>{
         <div >
             {isError && <Title type="danger" level={5}>Something went wrong. Please try again later</Title>
             }
+            <Tooltip title="Client's name and API Key are mandatory" >
+                <InfoCircleOutlined style={{color:'#222a56'}}/>
+            </Tooltip>
             <div>
                 <Title level={5}>Perfana client</Title>
-                <Input onChange={setPerfanaClientHandler} placeholder="Perfana client"/>
+                {isPerfanaClientValid ? <Input onChange={setPerfanaClientHandler}  /> :
+                <Input status="error" onChange={setPerfanaClientHandler} placeholder="min length is 4"/>}
             </div>
             <div>
                 <Title level={5}>Test tool</Title>
-                <Radio.Group onChange={onChange} value={testToolIndex}>
+                <Radio.Group onChange={onTestToolChangeHandler} value={testToolIndex}>
                     <Space direction="vertical">
                         {TEST_TOOLS.map(item => <Radio key={item.index} value={item.index}>{item.name}</Radio>)}
                     </Space>
@@ -81,7 +87,8 @@ export const Form = () =>{
             </div>
             <div>
                 <Title level={5}>Perfana API Key</Title>
-                <Input onChange={setPerfanaAPIKeyHandler} placeholder="Perfana API Key"/>
+                {isPerfanaAPIKeyValid ? <Input onChange={setPerfanaAPIKeyHandler}/> :
+                    <Input onChange={setPerfanaAPIKeyHandler} status="error" placeholder="min length is 8"/>}
             </div>
             <div>
                 <Title level={5}>Public Key Certificate</Title>
@@ -101,8 +108,8 @@ export const Form = () =>{
                     style={{height: 120, resize: 'none'}}
                 />
             </div>
-            <Button type="primary" onClick={onClick} disabled={!valid}
-                    rootClassName={styles.button}>Generate</Button>
+                <Button type="primary" onClick={onClick} disabled={!(isPerfanaClientValid && isPerfanaAPIKeyValid)}
+                        rootClassName={styles.button}>Generate</Button>
 
     </div>
 
