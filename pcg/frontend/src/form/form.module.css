@@ -1,0 +1,10 @@
+.container {
+    display: flex;
+}
+.button {
+    margin-top: 1rem;
+    background: #222a56;
+}
+.spinnerContainer {
+    display: flex;
+}
