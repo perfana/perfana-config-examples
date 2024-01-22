@@ -12,7 +12,8 @@ RUN apk add --no-cache curl && apk add --no-cache zip
 RUN curl -s "https://get.sdkman.io" | bash
 RUN bash -c "source \"$HOME/.sdkman/bin/sdkman-init.sh\" \
   && sdk install kotlin \
-  && sdk install kscript"
+  && sdk install kscript \
+  && sdk flush"
 RUN chmod u+x /files/generate-config.sh 
   
 CMD ["java", "-jar", "app.jar"]

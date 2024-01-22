@@ -2,7 +2,7 @@
 
 set -o errexit
 
-VERSION="0.0.2"
+VERSION="0.0.3"
 
 # use "local" or "remote" as first parameter to build locally or push to docker hub
 local_or_remote="${1:-local}"
@@ -12,15 +12,16 @@ if [ "$JAVA_VER" != "21" ]; then echo "ERROR: use java 21 instead of $JAVA_VER";
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PCG_DIR=$(dirname "$SCRIPT_DIR")
-PROJECT_DIR=$(dirname "$PCG_DIR")
 
 mkdir -p "$SCRIPT_DIR/files"
 cp -v "$SCRIPT_DIR/generate-config.sh" "$SCRIPT_DIR/files"
-rsync -av --progress "$PROJECT_DIR" "$SCRIPT_DIR/files" --exclude .git --exclude .idea
+# saves repo files from main branch to files/perfana-config-examples-main
+wget https://github.com/perfana/perfana-config-examples/archive/refs/heads/main.tar.gz -O - | tar -xz -C "$SCRIPT_DIR/files"
+mv -v "$SCRIPT_DIR/files/perfana-config-examples-main" "$SCRIPT_DIR/files/perfana-config-examples"
 
 cd "$PCG_DIR" || exit
 "./mvnw" clean package
-cp "$PCG_DIR/target/perfana-config-generator-0.0.1-SNAPSHOT.jar" "$SCRIPT_DIR/app.jar"
+cp "$PCG_DIR/target/perfana-config-generator-$VERSION.jar" "$SCRIPT_DIR/app.jar"
 
 cd "$SCRIPT_DIR" || exit
 if [ "$local_or_remote" == "remote" ]; then
