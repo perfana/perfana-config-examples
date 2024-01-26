@@ -4,9 +4,15 @@ Docker image to easily generate Perfana configuration files.
 
 # Run
 
-    docker run --rm -d -p 9600:8080 --name perfana-config-gen perfana/perfana-config-gen:0.0.1
+    docker run --rm -d -p 9600:8080 --name perfana-config-gen perfana/perfana-config-gen:0.0.3
+
+Browse to http://localhost:9600 to use the application or use the REST API with curl as described below.
 
 Run without `-d` to see logging and stop with `ctrl-c`.
+
+To stop and remove this container:
+
+    docker stop perfana-config-gen
 
 # Create config files
 
@@ -37,10 +43,13 @@ Connect to local running Afterburner:
 
     time curl -v -X GET localhost:8080/delay
 
-Start a load test, follow steps to build your own load test image first.
+If needed, point to local kubernetes cluster, for k3d:
 
-    k3d image import maven-gatling-loadtest:v0.1 -c <cluster-name>
-    kubectl run -it --rm --restart=Never --image maven-gatling-loadtest:v0.1 loadtest -- mvn events-gatling:test
+    export KUBECONFIG="$(k3d kubeconfig write $CLIENT_NAME)"
+
+Start a load test in the loadtest container that is part of the setup:
+
+    kubectl -n perfana-starter exec -it deploy/loadtest -- mvn events-gatling:test
 
 To remove the local cluster:
 

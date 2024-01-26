@@ -1,5 +1,9 @@
-FROM grafana/k6:latest AS k6official
-FROM maven:3.9.4-amazoncorretto-20-al2023 AS builder
+# see latest: https://hub.docker.com/_/maven/tags?page=1&name=corretto-21
+ARG  IMAGE_VERSION=3.9.6-amazoncorretto-21-al2023
+
+# see latest: https://hub.docker.com/r/grafana/k6/tags
+FROM grafana/k6:0.48.0 AS k6official
+FROM maven:${IMAGE_VERSION} AS builder
 
 WORKDIR /loadtest
 COPY pom-init.xml /loadtest/pom.xml
@@ -7,7 +11,7 @@ COPY load-script /loadtest
 # fill .m2 cache
 RUN mvn -DconstantLoadTimeInSeconds=1 -DrampupTimeInSeconds=1 -DperfanaEnabled=false event-scheduler:test
 
-FROM maven:3.9.4-amazoncorretto-20-al2023
+FROM maven:${IMAGE_VERSION}
 
 COPY --from=k6official /usr/bin/k6 /usr/bin/k6
 

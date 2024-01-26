@@ -69,7 +69,9 @@ kubectl wait deployment perfana-secure-gateway --for condition=Available=True --
 # Custom function to handle errors
 handle_helm_error() {
     echo "Error occurred in helm test, check the logs:"
-    kubectl logs -l app.kubernetes.io/instance=perfana-secure-gateway
+    kubectl -n perfana-starter logs -l app.kubernetes.io/instance=perfana-secure-gateway
+    echo "===================================================="
+    echo "To test again: helm test perfana-secure-gateway"
     exit 1
 }
 
@@ -84,4 +86,4 @@ trap - ERR
 echo ""
 echo "Now you can run a test using:"
 echo "export KUBECONFIG=\"$KUBECONFIG\""
-echo "kubectl exec -it deploy/loadtest -- {{ loadTestToolMavenCommand }}"
+echo "kubectl -n perfana-starter exec -it deploy/loadtest -- {{ loadTestToolMavenCommand }}"

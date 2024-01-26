@@ -1,4 +1,7 @@
-FROM maven:3.9.4-amazoncorretto-20-al2023 AS builder
+# see latest: https://hub.docker.com/_/maven/tags?page=1&name=corretto-21
+ARG  IMAGE_VERSION=3.9.6-amazoncorretto-21-al2023
+
+FROM maven:${IMAGE_VERSION} AS builder
 
 WORKDIR /loadtest
 COPY pom-init.xml /loadtest/pom.xml
@@ -6,10 +9,10 @@ COPY load-script /loadtest
 # fill .m2 cache
 RUN mvn -DconstantLoadTimeInSeconds=1 -DrampupTimeInSeconds=1 -DperfanaEnabled=false events-gatling:test
 
-FROM maven:3.9.4-amazoncorretto-20-al2023
+FROM maven:${IMAGE_VERSION}
 
 WORKDIR /loadtest
-RUN curl -L -Ss -o /bin/g2i "https://github.com/perfana/gatling-to-influxdb/releases/download/g2i-1.0.0/g2i" \
+RUN curl -L -Ss -o /bin/g2i "https://github.com/perfana/gatling-to-influxdb/releases/download/g2i-1.0.2/g2i" \
     && chmod u+x /bin/g2i
 # the loadtest dir is overridden in the kubectl apply setup, \
 # so this link is not available
