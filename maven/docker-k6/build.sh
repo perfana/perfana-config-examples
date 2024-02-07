@@ -9,7 +9,7 @@ local_or_remote="${1:-local}"
 
 if [ "$local_or_remote" == "remote" ]; then
     echo "Building for docker hub."
-    docker buildx build --platform linux/amd64,linux/arm64 -t perfana/maven-k6-loadtest:$VERSION --push .
+    docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t perfana/maven-k6-loadtest:$VERSION --push .
 else
     echo "Building locally."
     docker build -t perfana/maven-k6-loadtest:$VERSION-SNAPSHOT .
