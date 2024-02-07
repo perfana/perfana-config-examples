@@ -6,15 +6,21 @@ Generate a `pom.xml` for jMeter, K6 or Gatling.
 
 ## Docker image for jMeter
 
-Build a docker image for jMeter and Maven in the `docker-jmeter` directory using `build.sh`.
-It builds an image with all needed files and config inside.
+The jmeter image contains maven, j2i and pre-loaded dependencies for jMeter.
 
-Run in a cluster as:
+Run as docker image with mapping the pom.xml and jmeter script files:
 
-    kubectl run -it --rm --restart=Never --image maven-jmeter-loadtest:v0.1 loadtest -- sh
-    
+    docker run -it --rm --name loadtest --entrypoint sh \
+    -v $(pwd)/pom.xml:/loadtest/pom.xml \
+    -v $(pwd)/src:/loadtest/src \
+    perfana/maven-jmeter-loadtest:0.0.3
+
+Run in a kubernetes as demonstrated in `loadtest-example.yaml` file.
+
 At the shell command, type `mvn verify` to start the load test.
 Or replace `sh` with `mvn verify` to run directly.
+
+Build a new docker image for jMeter and Maven in the `docker-jmeter` directory using `build.sh`.
 
 ### Steps
 
