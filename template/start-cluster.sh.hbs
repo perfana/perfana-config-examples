@@ -4,15 +4,11 @@ set -o errexit
 
 client_name={{ client }}
 
-# Check if docker is installed
-if ! command -v docker &> /dev/null; then
-    echo "docker is not installed. Please install docker first."
-    exit 1
-fi
+# we require a k8s cluster to be available
 
-# Check if k3d is installed
-if ! command -v k3d &> /dev/null; then
-    echo "k3d is not installed. Please install k3d first."
+# Check if kubectl is installed
+if ! command -v kubectl &> /dev/null; then
+    echo "kubectl is not installed. Please install kubectl first."
     exit 1
 fi
 
@@ -22,18 +18,16 @@ if ! command -v helm &> /dev/null; then
     exit 1
 fi
 
-if k3d cluster list | grep -q "$client_name"; then
-    echo "Cluster $client_name is available."
-else
-    echo "Cluster $client_name is not available, create it."
-    k3d cluster create --image rancher/k3s:v1.28.2-k3s1 $client_name
+kubectx=`kubectl config current-context`
+# check with user for context and namespace
+if [[ -z $kubectx ]]; then
+    echo "There is no k8s cluster available or selected. Please make sure you have a k8s cluster available."
+    exit 1
 fi
 
-export KUBECONFIG="$(k3d kubeconfig write $client_name)"
-
-echo "Create perfana-starter namespace"
-kubectl create namespace perfana-starter
-kubectl config set-context --current --namespace=perfana-starter
+echo "Create perfana-starter-{{ client }} namespace"
+kubectl create namespace perfana-starter-{{ client }}
+kubectl config set-context --current --namespace=perfana-starter-{{ client }}
 
 echo "Create afterburner SUT"
 kubectl apply -f afterburner.yaml
@@ -61,7 +55,7 @@ else
     helm repo add $helm_repo_name https://$helm_repo_name.github.io/helm-charts
 fi
 
-helm install --namespace=perfana-starter perfana-secure-gateway perfana/perfana-secure-gateway --version 0.1.21 --values psg-values.yaml
+helm install --namespace=perfana-starter-{{ client }} perfana-secure-gateway perfana/perfana-secure-gateway --version 0.1.21 --values psg-values.yaml
 
 echo "Wait for perfana-secure-gateway to be ready"
 kubectl wait deployment perfana-secure-gateway --for condition=Available=True --timeout=120s
@@ -69,7 +63,7 @@ kubectl wait deployment perfana-secure-gateway --for condition=Available=True --
 # Custom function to handle errors
 handle_helm_error() {
     echo "Error occurred in helm test, check the logs:"
-    kubectl -n perfana-starter logs -l app.kubernetes.io/instance=perfana-secure-gateway
+    kubectl -n perfana-starter-{{ client }} logs -l app.kubernetes.io/instance=perfana-secure-gateway
     echo "===================================================="
     echo "To test again: helm test perfana-secure-gateway"
     exit 1
@@ -86,4 +80,4 @@ trap - ERR
 echo ""
 echo "Now you can run a test using:"
 echo "export KUBECONFIG=\"$KUBECONFIG\""
-echo "kubectl -n perfana-starter exec -it deploy/loadtest -- {{ loadTestToolMavenCommand }}"
+echo "kubectl -n perfana-starter-{{ client }} exec -it deploy/loadtest -- {{ loadTestToolMavenCommand }}"

@@ -16,8 +16,8 @@
         
         <events-gatling-maven-plugin.version>4.7.0-events-1</events-gatling-maven-plugin.version>
         <gatling.version>3.10.3</gatling.version>
-        <kotlin.version>1.9.10</kotlin.version>
-        <scala-maven-plugin.version>4.8.0</scala-maven-plugin.version>
+        <kotlin.version>1.9.22</kotlin.version>
+        <scala-maven-plugin.version>4.8.1</scala-maven-plugin.version>
         
         <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
         <test-events-wiremock.version>[3.0.0,3.1.0)</test-events-wiremock.version>
@@ -56,7 +56,13 @@
     	<systemUnderTest>MyAfterburner</systemUnderTest>
         <version>v1.0.0</version>
         <tags>gatling,spring-boot-kubernetes</tags>
-        <apiKey>${ENV.PERFANA_API_KEY}</apiKey>
+        <apiKey>export PERFANA_CONFIG_EXAMPLES_DIR=$(pwd)/perfana-config-examples
+export PERFANA_CLIENT=acme1
+export TEMPLATE_DIR=$PERFANA_CONFIG_EXAMPLES_DIR/template
+export PERFANA_API_KEY=$(pbpaste)
+export LOAD_TEST_TOOL=gatling
+export PSG_TLS_KEY=$(pwd)/tls.key
+export PSG_TLS_CRT=$(pwd)/tls.crt</apiKey>
         <influxUrl>http://perfana-secure-gateway/influxdb</influxUrl>
     </properties>
 
@@ -143,7 +149,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>CommandRunnerGatlingToInflux</name>
-                                <onStartTest>sh -c "./g2i target/gatling --stop-timeout 120 -a ${influxUrl} -u ${influxUser} -p ${influxPassword} -b companyx_gatling3 -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
+                                <onStartTest>sh -c "./g2i target/gatling --stop-timeout 120 -a ${influxUrl} -u ${influxUser} -p ${influxPassword} -b acme1_gatling3 -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>

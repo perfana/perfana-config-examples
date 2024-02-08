@@ -80,6 +80,7 @@ data class PerfanaConfig(
 )
 
 data class TracingConfig(
+    val client: String,
     val jaegerUrl: String,
     val bagageKeysHttpHeadersList: List<String>,
     val bagageKeysHttpHeaders: String,
@@ -106,6 +107,7 @@ data class StartShConfig(
 )
 
 data class LoadTestConfig(
+    val client: String,
     val loadTestTool: LoadTestTool,
     val imageTag: String,
 )
@@ -147,6 +149,7 @@ val sutConfig = SutConfig(
 val baggageHeaderList = listOf("perfana-test-run-id", "perfana-request-name")
 
 val tracingConfig = TracingConfig(
+    client = myClient,
     jaegerUrl = "http://otel-collector:9411/",
     bagageKeysHttpHeadersList = baggageHeaderList,
     bagageKeysHttpHeaders = baggageHeaderList.joinToString(","),
@@ -248,6 +251,7 @@ if (command == "otel-collector" || command == "all") {
 if (command == "loadtest" || command == "all") {
 
     val loadTestConfig =  LoadTestConfig(
+        client = myClient,
         loadTestTool = loadTestTool,
         imageTag = "0.0.3"
     )
