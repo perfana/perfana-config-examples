@@ -1,16 +1,11 @@
 #!/usr/bin/env sh
 
 client_name={{ client }}
+client_namespace=perfana-starter-{{ client }}
 
-# Check if docker is installed
-if ! command -v docker &> /dev/null; then
-    echo "docker is not installed. Please install docker first."
-    exit 1
-fi
-
-# Check if k3d is installed
-if ! command -v k3d &> /dev/null; then
-    echo "k3d is not installed. Please install k3d first."
+# Check if kubectl is installed
+if ! command -v kubectl &> /dev/null; then
+    echo "kubectl is not installed. Please install kubectl first."
     exit 1
 fi
 
@@ -20,8 +15,14 @@ if ! command -v helm &> /dev/null; then
     exit 1
 fi
 
-export KUBECONFIG="$(k3d kubeconfig write $client_name)"
-kubectl config set-context --current --namespace=perfana-starter
+kubectx=`kubectl config current-context`
+# check with user for context and namespace
+    if [[ -z $kubectx ]]; then
+    echo "There is no k8s cluster available or selected. Please make sure you have a k8s cluster available."
+    exit 1
+fi
+
+kubectl config set-context --current --namespace=$client_namespace
 
 echo "Remove Afterburner SUT"
 kubectl delete -f afterburner.yaml
@@ -40,14 +41,7 @@ kubectl delete configmaps pom.xml
 echo "Remove perfana-secure-gateway"
 helm uninstall perfana-secure-gateway
 
-echo "Remove perfana-starter namespace"
-kubectl delete namespace perfana-starter
+echo "Remove perfana-starter-{{client}} namespace"
+kubectl delete namespace $client_namespace
 
-if k3d cluster list | grep -q "$client_name"; then
-    echo "Cluster $client_name is available."
-    k3d cluster delete $client_name
-else
-    echo "Cluster $client_name is not available."
-fi
-
-echo "Removed all components of local cluster."
+echo "Removed all perfana starter components."

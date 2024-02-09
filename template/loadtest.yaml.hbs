@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: loadtest
-  namespace: perfana-starter
+  namespace: perfana-starter-{{client}}
 spec:
   replicas: 1
   selector:

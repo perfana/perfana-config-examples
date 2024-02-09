@@ -26,7 +26,7 @@ class PerfanaConfigGeneratorController(val storage: FileStorage) {
     val zipFiles: ConcurrentHashMap<String, Path> = ConcurrentHashMap()
 
     @PostMapping("/upload")
-    fun upload(@RequestParam file: MultipartFile): FileUploadResponse {
+    fun upload(@RequestParam file: MultipartFile): String {
         val projectId = "perfana-starter-${DATE_TIME_FORMATTER.format(java.time.LocalDateTime.now())}"
         val workDir = storage.createProjectDirectory(file, projectId)
 
@@ -34,7 +34,7 @@ class PerfanaConfigGeneratorController(val storage: FileStorage) {
         file.originalFilename?.let { generateAndZipAsync(workDir, it, projectId) }
 
         // now return zip download url
-        return FileUploadResponse(projectId, "/download/${projectId}")
+        return projectId
     }
 
     private fun generateAndZipAsync(workDir: Path, zipFileName: String, projectId: String) {

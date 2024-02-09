@@ -143,7 +143,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>CommandRunnerGatlingToInflux</name>
-                                <onStartTest>sh -c "./g2i target/gatling --stop-timeout 120 -a ${influxUrl} -u ${influxUser} -p ${influxPassword} -b companyx_gatling3 -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
+                                <onStartTest>sh -c "./g2i target/gatling --stop-timeout 120 -a ${influxUrl} -u ${influxUser} -p ${influxPassword} -b acme1_gatling3 -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
