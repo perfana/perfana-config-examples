@@ -56,13 +56,7 @@
     	<systemUnderTest>MyAfterburner</systemUnderTest>
         <version>v1.0.0</version>
         <tags>gatling,spring-boot-kubernetes</tags>
-        <apiKey>export PERFANA_CONFIG_EXAMPLES_DIR=$(pwd)/perfana-config-examples
-export PERFANA_CLIENT=acme1
-export TEMPLATE_DIR=$PERFANA_CONFIG_EXAMPLES_DIR/template
-export PERFANA_API_KEY=$(pbpaste)
-export LOAD_TEST_TOOL=gatling
-export PSG_TLS_KEY=$(pwd)/tls.key
-export PSG_TLS_CRT=$(pwd)/tls.crt</apiKey>
+        <apiKey>${ENV.PERFANA_API_KEY}</apiKey>
         <influxUrl>http://perfana-secure-gateway/influxdb</influxUrl>
     </properties>
 

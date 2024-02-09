@@ -127,7 +127,7 @@ data:
       global:
         scrape_interval: 60s
         remote_write:
-          - url: http://perfana-secure-gateway.perfana-starter.svc.cluster.local/mimir/api/v1/push
+          - url: http://perfana-secure-gateway.perfana-starter-{{client}}.svc.cluster.local/mimir/api/v1/push
       configs:
         - name: agent
           scrape_configs:
@@ -136,4 +136,4 @@ data:
             honor_labels: true
             metrics_path: /actuator/prometheus
             static_configs:
-              - targets: ["afterburner.perfana-starter.svc.cluster.local:80"]
+              - targets: ["afterburner.perfana-starter-{{client}}.svc.cluster.local:80"]
