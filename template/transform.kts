@@ -253,7 +253,7 @@ if (command == "loadtest" || command == "all") {
     val loadTestConfig =  LoadTestConfig(
         client = myClient,
         loadTestTool = loadTestTool,
-        imageTag = "0.0.3"
+        imageTag = "0.0.4"
     )
     val templateLoadTest = handlebars.compile("loadtest.yaml")
     println(templateLoadTest.apply(loadTestConfig))

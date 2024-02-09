@@ -4,7 +4,7 @@ Docker image to easily generate Perfana configuration files.
 
 # Run
 
-    docker run --rm -d -p 9600:8080 --name perfana-config-gen perfana/perfana-config-gen:0.0.3
+    docker run --rm -d -p 9600:8080 --name perfana-config-gen perfana/perfana-config-gen:0.0.4
 
 Browse to http://localhost:9600 to use the application or use the REST API with curl as described below.
 

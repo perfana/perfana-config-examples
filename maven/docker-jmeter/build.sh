@@ -2,7 +2,7 @@
 
 set -o errexit
 
-VERSION="0.0.3"
+VERSION="0.0.4"
 
 # use "local" or "remote" as first parameter to build locally or push to docker hub
 local_or_remote="${1:-local}"
