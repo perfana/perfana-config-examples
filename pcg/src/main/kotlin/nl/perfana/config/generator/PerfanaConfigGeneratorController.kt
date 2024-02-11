@@ -35,13 +35,7 @@ class PerfanaConfigGeneratorController(val storage: FileStorage) {
             workDir,
             "source /root/.bashrc && /files/generate-config.sh $zipFileName $generatedFilesDir"
         )
-
-        // get the value of the PERFANA_CLIENT variable from setup.sh
-        val shellCommand = listOf("/bin/bash", "-c", "source ${workDir}/unzip/setup.sh && echo \$PERFANA_CLIENT")
-        val process = ProcessBuilder(shellCommand).start()
-        val reader = InputStreamReader(process.inputStream)
-        val perfana_client = reader.readText().trim()
-        println("Result: $perfana_client")
+        val perfana_client = readPerfanaClientValue(workDir)
 
         // create the projectId
         val projectId = "perfana-starter-${perfana_client}-${timeStamp}"
@@ -52,6 +46,18 @@ class PerfanaConfigGeneratorController(val storage: FileStorage) {
         zipFiles[projectId] = zipFile
 
         return projectId
+    }
+
+    private fun readPerfanaClientValue(workDir: Path): String {
+        // get the value of the PERFANA_CLIENT variable from setup.sh
+        val shellCommand = listOf("/bin/bash", "-c", "source ${workDir}/unzip/setup.sh && echo \$PERFANA_CLIENT")
+        val process = ProcessBuilder(shellCommand).start()
+        val reader = InputStreamReader(process.inputStream)
+        val perfana_client = reader.readText().trim()
+        println("Result: $perfana_client")
+        reader.close()
+        process.destroy()
+        return perfana_client
     }
 
     private fun executeCommand(workDir: Path, command: String) {
@@ -72,7 +78,7 @@ class PerfanaConfigGeneratorController(val storage: FileStorage) {
             }
         } finally {
             val output = extractOutput(process)
-            print(output)
+            println(output)
             process.destroy()
         }
     }
@@ -96,12 +102,17 @@ class PerfanaConfigGeneratorController(val storage: FileStorage) {
 
         val resource = storage.fileAsResource(zipFile)
 
-        // now return zip
-        // use with:
-        // ```curl -X POST -F file=@<NAME>.zip --remote-header -O -sS http://localhost:9600/generate```
-        return ResponseEntity.ok()
+
+        val response = ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_OCTET_STREAM)
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=$projectId.zip")
             .body(resource)
+
+        storage.cleanup(workDir)
+
+        // now return zip
+        // use with:
+        // ```curl -X POST -F file=@<NAME>.zip --remote-header -O -sS http://localhost:9600/generate```
+        return response
     }
 }

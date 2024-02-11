@@ -7,14 +7,6 @@ TARGET_DIR=${2:-/loadtest}
 
 UNZIP_DIR=unzip
 
-# Define cleanup procedure
-cleanup() {
-    echo "Cleaning up..."
-    [ -d "$UNZIP_DIR" ] && rm -rf "$UNZIP_DIR"
-}
-
-trap cleanup EXIT
-
 echo "generating config from $ZIP_FILE"
 echo "current dir: $(pwd)"
 
