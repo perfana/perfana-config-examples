@@ -36,7 +36,6 @@ cd "$SCRIPT_DIR" || exit
 if [ "$local_or_remote" == "remote" ]; then
     echo "Building for docker hub."
     docker buildx build --platform linux/amd64,linux/arm64 -t perfana/perfana-config-gen:$VERSION --push .
-    docker buildx imagetools create -t perfana/perfana-config-gen:latest perfana/perfana-config-gen:$VERSION
 else
     echo "Building locally."
     docker build -t perfana/perfana-config-gen:$VERSION-SNAPSHOT .
