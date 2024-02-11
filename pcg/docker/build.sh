@@ -2,7 +2,7 @@
 
 set -o errexit
 
-VERSION="0.0.5"
+VERSION="0.0.6"
 
 # Define cleanup procedure
 cleanup() {
