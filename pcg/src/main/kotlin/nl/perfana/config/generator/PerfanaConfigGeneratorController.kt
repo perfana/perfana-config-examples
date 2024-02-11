@@ -1,11 +1,12 @@
 package nl.perfana.config.generator
 
-import jakarta.servlet.http.HttpServletRequest
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -24,18 +25,6 @@ class PerfanaConfigGeneratorController(val storage: FileStorage) {
     }
 
     val zipFiles: ConcurrentHashMap<String, Path> = ConcurrentHashMap()
-
-    @PostMapping("/upload")
-    fun upload(@RequestParam file: MultipartFile): String {
-        val projectId = "perfana-starter-${DATE_TIME_FORMATTER.format(java.time.LocalDateTime.now())}"
-        val workDir = storage.createProjectDirectory(file, projectId)
-
-        // this should be done in a co routine
-        file.originalFilename?.let { generateAndZipAsync(workDir, it, projectId) }
-
-        // now return zip download url
-        return projectId
-    }
 
     private fun generateAndZipAsync(workDir: Path, zipFileName: String, projectId: String) {
 
@@ -78,17 +67,26 @@ class PerfanaConfigGeneratorController(val storage: FileStorage) {
 
     private fun extractOutput(process: Process): String {
         val reader = BufferedReader(InputStreamReader(process.inputStream))
-        val output = reader.lines().collect(Collectors.joining(System.getProperty("line.separator")))
+        val output = reader.lines().collect(Collectors.joining(System.lineSeparator()))
         return output
     }
 
-    @GetMapping("/download/{projectId:.+}")
-    fun download(@PathVariable projectId: String, request: HttpServletRequest): ResponseEntity<Resource> {
+
+    @PostMapping("/generate")
+    fun generate(@RequestParam file: MultipartFile):  ResponseEntity<Resource> {
+        val projectId = "perfana-starter-${DATE_TIME_FORMATTER.format(java.time.LocalDateTime.now())}"
+        val workDir = storage.createProjectDirectory(file, projectId)
+
+        // this should be done in a co routine
+        file.originalFilename?.let { generateAndZipAsync(workDir, it, projectId) }
 
         val zipFile = zipFiles[projectId] ?: throw RuntimeException("Zip file for $projectId unknown or not ready.")
 
         val resource = storage.fileAsResource(zipFile)
 
+        // now return zip
+        // use with:
+        // ```curl -X POST -F file=@<NAME>.zip --remote-header -O -sS http://localhost:9600/generate```
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_OCTET_STREAM)
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=$projectId.zip")
