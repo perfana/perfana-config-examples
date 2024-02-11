@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>nl.perfana.config.generator</groupId>
 	<artifactId>perfana-config-generator</artifactId>
-	<version>0.0.4</version>
+	<version>0.0.5</version>
 	<name>perfana-generator</name>
 	<description>REST call to generate Perfana configuration files</description>
 	<properties>
