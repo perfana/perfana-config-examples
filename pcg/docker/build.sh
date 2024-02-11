@@ -2,7 +2,17 @@
 
 set -o errexit
 
-VERSION="0.0.4"
+VERSION="0.0.5"
+
+# Define cleanup procedure
+cleanup() {
+    echo "Cleaning up..."
+    [ -f app.jar ] && rm -v app.jar
+    [ -d files ] && rm -rf files
+    echo "Done."
+}
+
+trap cleanup EXIT
 
 # use "local" or "remote" as first parameter to build locally or push to docker hub
 local_or_remote="${1:-local}"
@@ -26,12 +36,9 @@ cd "$SCRIPT_DIR" || exit
 if [ "$local_or_remote" == "remote" ]; then
     echo "Building for docker hub."
     docker buildx build --platform linux/amd64,linux/arm64 -t perfana/perfana-config-gen:$VERSION --push .
+    docker buildx imagetools create -t perfana/perfana-config-gen:latest perfana/perfana-config-gen:$VERSION
 else
     echo "Building locally."
     docker build -t perfana/perfana-config-gen:$VERSION-SNAPSHOT .
 fi
 
-echo "removing files"
-if [ -f app.jar ]; then rm -v app.jar; fi
-if [ -d files ]; then rm -rf files; fi
-echo "done"

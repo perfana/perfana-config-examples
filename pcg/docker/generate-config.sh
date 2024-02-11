@@ -7,14 +7,23 @@ TARGET_DIR=${2:-/loadtest}
 
 UNZIP_DIR=unzip
 
+# Define cleanup procedure
+cleanup() {
+    echo "Cleaning up..."
+    [ -d "$UNZIP_DIR" ] && rm -rf "$UNZIP_DIR"
+}
+
+trap cleanup EXIT
+
 echo "generating config from $ZIP_FILE"
 echo "current dir: $(pwd)"
 
 mkdir -p "$TARGET_DIR"
 
+# -j is for junk paths so no subdirs are created
 unzip -j -o "$ZIP_FILE" -d $UNZIP_DIR
 
-source unzip/setup.sh
+source $UNZIP_DIR/setup.sh
 
 # override some settings for local generation
 export HOMEDIR=/files
