@@ -26,7 +26,7 @@ class PerfanaConfigGeneratorController(val storage: FileStorage) {
 
     val zipFiles: ConcurrentHashMap<String, Path> = ConcurrentHashMap()
 
-    private fun generateAndZipAsync(workDir: Path, zipFileName: String, projectId: String) {
+    private fun generateAndZipAsync(workDir: Path, zipFileName: String, timeStamp: String): String {
 
         val generatedFilesDir = "generated-files"
 
@@ -36,10 +36,22 @@ class PerfanaConfigGeneratorController(val storage: FileStorage) {
             "source /root/.bashrc && /files/generate-config.sh $zipFileName $generatedFilesDir"
         )
 
+        // get the value of the PERFANA_CLIENT variable from setup.sh
+        val shellCommand = listOf("/bin/bash", "-c", "source ${workDir}/unzip/setup.sh && echo \$PERFANA_CLIENT")
+        val process = ProcessBuilder(shellCommand).start()
+        val reader = InputStreamReader(process.inputStream)
+        val perfana_client = reader.readText().trim()
+        println("Result: $perfana_client")
+
+        // create the projectId
+        val projectId = "perfana-starter-${perfana_client}-${timeStamp}"
+
         // now zip generated files
         val zipFile = storage.zip(workDir.resolve(generatedFilesDir), workDir, projectId)
         // keep in mapping for future download
         zipFiles[projectId] = zipFile
+
+        return projectId
     }
 
     private fun executeCommand(workDir: Path, command: String) {
@@ -74,11 +86,11 @@ class PerfanaConfigGeneratorController(val storage: FileStorage) {
 
     @PostMapping("/generate")
     fun generate(@RequestParam file: MultipartFile):  ResponseEntity<Resource> {
-        val projectId = "perfana-starter-${DATE_TIME_FORMATTER.format(java.time.LocalDateTime.now())}"
-        val workDir = storage.createProjectDirectory(file, projectId)
+        val timeStamp = DATE_TIME_FORMATTER.format(java.time.LocalDateTime.now())
+        val workDir = storage.createProjectDirectory(file, timeStamp)
 
         // this should be done in a co routine
-        file.originalFilename?.let { generateAndZipAsync(workDir, it, projectId) }
+        val projectId = generateAndZipAsync(workDir, file.originalFilename!!, timeStamp)
 
         val zipFile = zipFiles[projectId] ?: throw RuntimeException("Zip file for $projectId unknown or not ready.")
 

@@ -34,6 +34,8 @@ export TEMPLATE_DIR=$PERFANA_CONFIG_EXAMPLES_DIR/template
 export PSG_TLS_KEY=$UNZIP_DIR/tls.key
 export PSG_TLS_CRT=$UNZIP_DIR/tls.crt
 
+cp $TEMPLATE_DIR/SETUP.md "$TARGET_DIR"
+
 # generate config
 $TEMPLATE_DIR/transform.kts psg > "$TARGET_DIR"/psg-values.yaml
 $TEMPLATE_DIR/transform.kts otel-collector > "$TARGET_DIR"/otel-collector-gen.yaml
