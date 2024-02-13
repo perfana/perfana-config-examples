@@ -259,6 +259,13 @@ if (command == "loadtest" || command == "all") {
     println(templateLoadTest.apply(loadTestConfig))
 }
 
+if (command == "compose" || command == "all") {
+    val templateAgentConfig = handlebars.compile("agent.yaml")
+    println(templateAgentConfig.apply(perfanaConfig))
+    val templateCompose = handlebars.compile("docker-compose.yaml")
+    println(templateCompose.apply(perfanaConfig))
+}
+
 val startShConfig = StartShConfig(
     client = myClient,
     loadTestTool = loadTestTool,

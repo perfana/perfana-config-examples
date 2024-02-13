@@ -1,0 +1,112 @@
+version: '3'
+
+services:
+  afterburner:
+    image: perfana/afterburner:2.4.1-SNAPSHOT-b9db625
+    ports:
+      - "80:8080"
+    environment:
+      - spring.zipkin.enabled=true
+      - spring.zipkin.base-url={{jaegerUrl}}
+      - spring.sleuth.sampler.probability=1.0
+      - spring.sleuth.propagation.tag.enabled=true
+      - spring.sleuth.keys.http.headers={{bagageKeysHttpHeaders}}
+      - spring.sleuth.baggage.tag-fields={{bagageKeysHttpHeaders}}
+      - spring.sleuth.baggage.remote-fields={{bagageKeysHttpHeaders}}
+      - spring.sleuth.baggage-keys="{{bagageKeysHttpHeaders}}"{{#bagageKeys}}{{#entrySet}}
+      - management.metrics.tags.{{key}}="{{value}}"{{/entrySet}}{{/bagageKeys}}
+
+  grafana-agent:
+    image: grafana/agent:v0.37.2
+    restart: unless-stopped
+    entrypoint:
+      - /bin/grafana-agent
+      - -config.expand-env=true
+      - -config.file=/etc/agent/agent.yaml
+      - -enable-features=integrations-next
+      - -server.http.address=0.0.0.0:80
+    volumes:
+      - agent-wal:/var/lib/agent
+      - ./agent.yml:/etc/agent-config/agent.yaml
+#    environment:
+#      - HOSTNAME
+    ports:
+      - 80:80  # This exposes the internal 80 port of the container to the host machine
+
+  loadtest:
+    image: perfana/maven-{{ loadTestTool }}-loadtest:{{ imageTag }}
+    volumes:
+      - ./src:/loadtest/src
+      - ./pom.xml:/loadtest/pom.xml
+    command: "sh -c 'echo Unpacking loadtest tar; tar -xzf /tar/loadtest-PLACEHOLDER_LOAD_TEST_TOOL.tar.gz --strip-components=1 -C /loadtest/src; echo Finished unpacking loadtest tar;'"
+    depends_on:
+      - unpack-loadtest-tar
+
+#  unpack-loadtest-tar:
+#    image: alpine:3.18
+#    volumes:
+#      - ./src:/loadtest/src
+#      - ./tar:/tar
+
+  otel-collector:
+    image: otel/opentelemetry-collector:0.89.0
+    command: [ "/otelcol", "--config=/conf/otel-collector-config.yaml" ]
+    ports:
+      - 55679:55679
+      - 4317:4317
+      - 14250:14250
+      - 14268:14268
+      - 9411:9411
+      - 8888:8888
+    environment:
+      MY_POD_IP: host.docker.internal
+    volumes:
+      - otel-collector-config-vol:/conf
+      - otel-collector-secrets:/secrets
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.2'
+          memory: 400M
+
+  perfana-secure-gateway:
+    image: nginx:latest
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 512M
+        reservations:
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+    ports:
+      - 80
+    volumes:
+      - type: bind
+        source: ./secure
+        target: /etc/nginx/secure
+        read_only: true
+    environment:
+      PERFANA_CLIENT_DOMAIN: "${perfanaClientDomain}"
+      PERFANA_URL: "${perfanaUrl}"
+    networks:
+      - perfana-net
+    cap_drop:
+      - ALL
+    read_only: true
+
+networks:
+  perfana-net:
+    driver: bridge
+
+volumes:
+  agent-wal:
+  otel-collector-config-vol:
+    external: true
+  otel-collector-secrets:
+    external: true
