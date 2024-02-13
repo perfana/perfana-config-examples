@@ -51,7 +51,7 @@ class FileStorage(val filesPath: Path = Path.of("/tmp")) {
                 }
             })
         } catch (e: Exception) {
-            println("An error occurred while deleting directory: ${e.localizedMessage}")
+            println("An error occurred while deleting directory: $e")
         }
     }
 
