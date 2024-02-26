@@ -2,7 +2,7 @@
 
 set -o errexit
 
-VERSION="0.0.6"
+VERSION="0.0.7"
 
 # Define cleanup procedure
 cleanup() {
@@ -29,7 +29,7 @@ cp -v "$SCRIPT_DIR/generate-config.sh" "$SCRIPT_DIR/files"
 rsync -a --exclude-from=exclude-list "$PCG_DIR/.." "$SCRIPT_DIR/files/perfana-config-examples"
 
 cd "$PCG_DIR" || exit
-"./mvnw" clean package
+"./mvnw" -Drevision=$VERSION clean package
 cp "$PCG_DIR/target/perfana-config-generator-$VERSION.jar" "$SCRIPT_DIR/app.jar"
 
 cd "$SCRIPT_DIR" || exit
