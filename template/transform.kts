@@ -279,3 +279,8 @@ if (command == "stop" || command == "all") {
     val templateStopSh = handlebars.compile("stop-cluster.sh")
     println(templateStopSh.apply(startShConfig))
 }
+
+if (command == "update-loadtest" || command == "all") {
+    val templateUploadLoadtestSh = handlebars.compile("update-loadtest.sh")
+    println(templateUploadLoadtestSh.apply(startShConfig))
+}

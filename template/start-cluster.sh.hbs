@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 set -o errexit
 
@@ -18,12 +18,14 @@ if ! command -v helm &> /dev/null; then
     exit 1
 fi
 
-kubectx=`kubectl config current-context`
+set +o errexit
+kubectx=$(kubectl config current-context)
 # check with user for context and namespace
-if [[ -z $kubectx ]]; then
+if [[ $? -ne 0 || -z $kubectx ]]; then
     echo "There is no k8s cluster available or selected. Please make sure you have a k8s cluster available."
     exit 1
 fi
+set -o errexit
 
 echo "Create perfana-starter-{{ client }} namespace"
 kubectl create namespace perfana-starter-{{ client }}
@@ -79,5 +81,4 @@ trap - ERR
 
 echo ""
 echo "Now you can run a test using:"
-echo "export KUBECONFIG=\"$KUBECONFIG\""
 echo "kubectl -n perfana-starter-{{ client }} exec -it deploy/loadtest -- {{ loadTestToolMavenCommand }}"

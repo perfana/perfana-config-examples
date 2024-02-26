@@ -55,6 +55,15 @@ To remove the local cluster:
 
     stop-cluster.sh
 
+To update the pom.xml or the load script, run:
+
+    update-loadtest.sh
+
+This will update the loadtest container with the new pom.xml or loadscript. To change the
+load script, run this script twice to start. It will unpack the tar file on the first run,
+you can than change the load script. On the subsequent runs it will update the loadtest script
+in the container.
+
 # References
 
 * afterburner: https://github.com/perfana/afterburner

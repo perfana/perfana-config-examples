@@ -39,6 +39,8 @@ $TEMPLATE_DIR/transform.kts start > "$TARGET_DIR"/start-cluster.sh
 chmod u+x "$TARGET_DIR"/start-cluster.sh
 $TEMPLATE_DIR/transform.kts stop > "$TARGET_DIR"/stop-cluster.sh
 chmod u+x "$TARGET_DIR"/stop-cluster.sh
+$TEMPLATE_DIR/transform.kts update-loadtest > "$TARGET_DIR"/update-loadtest.sh
+chmod u+x "$TARGET_DIR"/update-loadtest.sh
 
 # this is default load script, later generate one based on open-api spec
 LOAD_SCRIPT_DIR=$PERFANA_CONFIG_EXAMPLES_DIR/maven/docker-$LOAD_TEST_TOOL/load-script/src

@@ -10,6 +10,12 @@ Ensure you have access to a local Kubernetes cluster. Options include:
 - **k3d:** Install k3d as per [k3d installation guide](https://k3d.io/v5.4.4/#installation).
 - **Docker Desktop Kubernetes:** Enable the built-in Kubernetes cluster in Docker Desktop through the settings.
 
+Create a new cluster or use an existing one. For example with `k3d`:
+
+```sh
+k3d cluster create mycluster
+```
+
 #### 2. Proper Permissions
 - For local clusters (e.g., Minikube, Kind, k3d), permissions are typically configured out of the box.
 - For remote clusters, ensure you have the necessary permissions to deploy applications.

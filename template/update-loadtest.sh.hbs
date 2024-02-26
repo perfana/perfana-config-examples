@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+set -o errexit
+
+LOAD_TEST_DIR=loadtest-{{ loadTestTool }}
+LOAD_TEST_TAR=loadtest-{{ loadTestTool }}.tar.gz
+
+if [ ! -d "$LOAD_TEST_DIR" ]; then
+  echo "Untar $LOAD_TEST_TAR in $LOAD_TEST_DIR"
+  mkdir -p "$LOAD_TEST_DIR"
+  tar xvfz "$LOAD_TEST_TAR" -C $LOAD_TEST_DIR
+else
+  echo "Replace $LOAD_TEST_TAR"
+  if [ -f "$LOAD_TEST_TAR" ]; then
+    tar cvzf "$LOAD_TEST_TAR" -C "$LOAD_TEST_DIR" src
+  fi
+fi
+
+LOAD_TEST_CONFIGMAP=loadtest-{{ loadTestTool }}.tar.gz
+
+echo "Delete pom and loadtest config maps"
+kubectl delete configmap $LOAD_TEST_CONFIGMAP
+kubectl delete configmap pom.xml
+
+echo "Create pom.xml and loadtest config maps"
+kubectl create configmap $LOAD_TEST_CONFIGMAP --from-file=$LOAD_TEST_TAR
+kubectl create configmap pom.xml --from-file=pom.xml
+kubectl rollout restart deployment loadtest
+
+
