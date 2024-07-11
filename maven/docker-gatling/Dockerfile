@@ -15,11 +15,11 @@ ARG TARGETOS
 ARG TARGETARCH
 
 WORKDIR /loadtest
-RUN curl -L -Ss -o /bin/g2i "https://github.com/perfana/gatling-to-influxdb/releases/download/g2i-1.0.3/g2i-${TARGETOS}-${TARGETARCH}" \
-    && chmod u+x /bin/g2i
+RUN curl -L -Ss -o /bin/x2i "https://github.com/perfana/x2i/releases/download/x2i-1.0.0/x2i-${TARGETOS}-${TARGETARCH}" \
+    && chmod u+x /bin/x2i
 # the loadtest dir is overridden in the kubectl apply setup, \
 # so this link is not available
-RUN ln -s /bin/g2i /loadtest/g2i
+RUN ln -s /bin/x2i /loadtest/x2i
 
 COPY --from=builder /root/.m2/ /root/.m2/
 
