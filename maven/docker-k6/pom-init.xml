@@ -112,7 +112,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>CommandRunnerK6ToInflux</name>
-                                <onStartTest>sh -c "./k2i . --stop-timeout 120 -a ${influxUrl} -u ${influxUser} -p ${influxPassword} -b companyx_k6 -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
+                                <onStartTest>sh -c "./x2i . -i k6 -a ${influxUrl} -u ${influxUser} -p ${influxPassword} -b companyx_k6 -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>Run k6 script</name>

@@ -153,7 +153,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>CommandRunnerJMeterToInflux</name>
-                                <onStartTest>sh -c "./j2i target/jmeter/results --stop-timeout 120 -a ${influxUrl} -b companyx_jmeter -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
+                                <onStartTest>sh -c "./x2i target/jmeter/results -i jmeter -a ${influxUrl} -b companyx_jmeter -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
