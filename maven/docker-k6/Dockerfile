@@ -1,5 +1,5 @@
 # see latest: https://hub.docker.com/_/maven/tags?page=1&name=corretto-21
-ARG  IMAGE_VERSION=3.9.6-amazoncorretto-21-al2023
+ARG IMAGE_VERSION=3.9.6-amazoncorretto-21-al2023
 
 # see latest: https://hub.docker.com/r/grafana/k6/tags
 FROM grafana/k6:0.48.0 AS k6official
@@ -16,12 +16,12 @@ FROM maven:${IMAGE_VERSION}
 COPY --from=k6official /usr/bin/k6 /usr/bin/k6
 
 WORKDIR /loadtest
-RUN curl -L -Ss -o /bin/k2i "https://github.com/perfana/gatling-to-influxdb/releases/download/k2i-0.0.1/k2i" \
-    && chmod u+x /bin/k2i
+RUN curl -L -Ss -o /bin/x2i "https://github.com/perfana/x2i/releases/download/x2i-1.0.0/x2i-linux-amd64" \
+    && chmod u+x /bin/x2i
 # the loadtest dir is overridden in the kubectl apply setup,
 # so this link is not available
 #  && fix issue in buildx for "Error while loading /usr/local/sbin/java: No such file or directory"
-RUN ln -s /bin/k2i /loadtest/k2i && ln -s /usr/bin/java /usr/local/sbin/java
+RUN ln -s /bin/x2i /loadtest/x2i && ln -s /usr/bin/java /usr/local/sbin/java
 
 COPY --from=builder /root/.m2/ /root/.m2/
 

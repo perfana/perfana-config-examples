@@ -13,7 +13,7 @@ Run as docker image with mapping the pom.xml and jmeter script files:
     docker run -it --rm --name loadtest --entrypoint sh \
     -v $(pwd)/pom.xml:/loadtest/pom.xml \
     -v $(pwd)/src:/loadtest/src \
-    perfana/maven-jmeter-loadtest:0.0.4
+    perfana/maven-jmeter-loadtest:0.0.5
 
 Run in a kubernetes as demonstrated in `loadtest-example.yaml` file.
 
