@@ -60,7 +60,7 @@ data:
         traces/1:
           receivers: [otlp, zipkin]
           processors: [memory_limiter, batch]
-          exporters: [otlp, debug]
+          exporters: [otlp]
 ---
 apiVersion: v1
 kind: Service
@@ -102,7 +102,7 @@ spec:
       component: otel-collector
   minReadySeconds: 5
   progressDeadlineSeconds: 120
-  replicas: 1 #TODO - adjust this to your own requirements
+  replicas: 1 # adjust this to your own requirements
   template:
     metadata:
       labels:
