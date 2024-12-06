@@ -6,13 +6,13 @@ spec:
         emptyDir: {}
       initContainers:
       - name: download-jfr-javaagent-jar
-        image: alpine:3.18
+        image: alpine:3.21
         command:
         - sh
         - -c
         args:
         - echo Downloading jfr-javaagent.jar;
-          wget -O /jfr/jfr-exporter.jar https://github.com/perfana/jfr-exporter/releases/download/0.1.0/jfr-exporter-0.1.0.jar;
+          wget -O /jfr/jfr-exporter.jar https://github.com/perfana/jfr-exporter/releases/download/0.5.0/jfr-exporter-0.5.0.jar;
           echo Finished downloading;
         volumeMounts:
         - mountPath: /jfr
@@ -21,7 +21,7 @@ spec:
       - name: afterburner
         env:
         - name: JAVA_TOOL_OPTIONS
-          value: -javaagent:/jfr/jfr-exporter.jar=application=MyAfterburner,influxUrl=http://perfana-secure-gateway/influxdb,influxDatabase=63f4cd97_jfr
+          value: -javaagent:/jfr/jfr-exporter.jar=application=MyAfterburner,influxUrl=http://perfana-secure-gateway/influxdb,influxDatabase=acme_jfr
         volumeMounts:
         - mountPath: /jfr
           name: jfr

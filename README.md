@@ -14,7 +14,7 @@ Find a minimal maven pom and related config files.
 
 # High over steps
 
-Get access to Perfana cloud. Get a Perfana API key. 
+Get access to Perfana Cloud. Get a Perfana API key plus key and certificate for secure communication.
 
 Configure and run Perfana Secure Gateway (PSG).
 
@@ -40,7 +40,7 @@ in a SpringBoot application add the application name.
 
 # Local cluster
 
-First approach is a local SUT and load test that connect to Perfana cloud.
+First approach is a local SUT and load test that connect to Perfana Cloud.
 
 Steps to start:
 
@@ -57,3 +57,15 @@ To run in the cluster:
     k3d image import maven-gatling-loadtest:v0.1 -c acme
     kubectl run -it --rm --restart=Never --image maven-gatling-loadtest:v0.1 loadtest -- mvn events-gatling:test
 
+# Local without cluster
+
+To connect without a cluster run both the `PSG` and the `otel-collector` locally.
+
+Steps:
+1. install nginx and otel-collector
+2. configure [nginx](psg/README.md) and [otel-collector](otel-collector/README.md) via instructions in the README.md of the respective directories
+3. run you local SUT and load test
+4. wrap your load test in a Maven script or via code, such as in Java or in Groovy
+
+The last step is needed to register the test run in Perfana Cloud and make sure
+the metrics are received and processed _during_ the test run.

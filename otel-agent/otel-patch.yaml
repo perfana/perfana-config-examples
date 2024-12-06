@@ -1,4 +1,4 @@
-sec:
+spec:
   template:
     spec:
       volumes:
@@ -6,25 +6,27 @@ sec:
         emptyDir: {}
       initContainers:
       - name: download-opentelemetry-javaagent-jar
-        image: alpine:3.18
+        image: alpine:3.21
         command:
         - sh
         - -c
         args:
         - echo Downloading opentelemetry-javaagent.jar;
-          wget -O /otel/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.30.0/opentelemetry-javaagent.jar;
+          wget -O /otel/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.10.0/opentelemetry-javaagent.jar;
           echo Finished downloading;
         volumeMounts:
         - mountPath: /otel
           name: otel
       containers:
-      - name: carts
+      - name: acme-app
         env:
         - name: JAVA_OPTS
           value: -javaagent:/otel/opentelemetry-javaagent.jar -Xms64m -Xmx128m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom
-            -Dspring.zipkin.enabled=false -Dotel.resource.attributes=service.name=carts
+            -Dspring.zipkin.enabled=false -Dotel.resource.attributes=service.name=acme-app
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
-          value: http://opentelemetry-demo-otelcol.opentelemetry-demo.svc.cluster.local:4317
+          value: http://opentelemetry-demo-jaeger-collector.opentelemetry-demo.svc.cluster.local:4317
+        - name: OTEL_METRICS_EXPORTER
+          value: none
         volumeMounts:
         - mountPath: /otel
           name: otel
