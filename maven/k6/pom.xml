@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>acme.io</groupId>
+    <artifactId>k6-sut</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+
+    <properties>
+
+        <perfanaUrl>http://localhost:28080/</perfanaUrl>
+        <apiKey>${ENV.PERFANA_API_KEY}</apiKey>
+
+        <!-- Default load settings -->
+        <initialUsersPerSecond>1</initialUsersPerSecond>
+        <targetConcurrency>10</targetConcurrency>
+        <rampupTimeInSeconds>30</rampupTimeInSeconds>
+        <constantLoadTimeInSeconds>300</constantLoadTimeInSeconds>
+
+        <!-- Settings for the Perfana test runs -->
+        <systemUnderTest>acme-app</systemUnderTest>
+        <testEnvironment>local</testEnvironment>
+        <workload>loadTest</workload>
+        <version>v1.0.0</version>
+        <tags>k6,jfr,spring-boot-kubernetes</tags>
+
+        <influxUrl>http://localhost:28080/influxdb/</influxUrl>
+        <influxDb>acme_k6</influxDb>
+
+        <!-- By default, debug mode is off -->
+        <debug>false</debug>
+
+        <!-- By default, assert test results -->
+        <assertResultsEnabled>true</assertResultsEnabled>
+
+        <!-- By default, send data to perfana -->
+        <perfanaEnabled>true</perfanaEnabled>
+
+        <!-- By default, enable events -->
+        <eventsEnabled>true</eventsEnabled>
+
+        <!-- dependency versioning -->
+        <event-scheduler-maven-plugin.version>3.0.4</event-scheduler-maven-plugin.version>
+        <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
+        <test-events-wiremock.version>[3.0.0,3.1.0)</test-events-wiremock.version>
+        <test-events-springboot.version>[3.0.0,3.1.0)</test-events-springboot.version>
+        <test-events-test-run-config-command.version>[3.0.0,3.1.0)</test-events-test-run-config-command.version>
+        <test-events-command-runner.version>[3.0.0,3.1.0)</test-events-command-runner.version>
+
+        <encoding>UTF-8</encoding>
+
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.perfana</groupId>
+                <artifactId>event-scheduler-maven-plugin</artifactId>
+                <version>${event-scheduler-maven-plugin.version}</version>
+                <configuration>
+                    <eventSchedulerConfig>
+                        <debugEnabled>${debug}</debugEnabled>
+                        <schedulerEnabled>${eventsEnabled}</schedulerEnabled>
+                        <testConfig>
+                            <systemUnderTest>${systemUnderTest}</systemUnderTest>
+                            <version>${version}</version>
+                            <workload>${workload}</workload>
+                            <testEnvironment>${testEnvironment}</testEnvironment>
+                            <testRunId>${testRunId}</testRunId>
+                            <buildResultsUrl>${buildResultsUrl}</buildResultsUrl>
+                            <rampupTimeInSeconds>${rampupTimeInSeconds}</rampupTimeInSeconds>
+                            <constantLoadTimeInSeconds>${constantLoadTimeInSeconds}</constantLoadTimeInSeconds>
+                            <annotations>${annotations}</annotations>
+                            <tags>${tags}</tags>
+                        </testConfig>
+                        <eventConfigs>
+                            <eventConfig implementation="io.perfana.event.PerfanaEventConfig">
+                                <name>PerfanaEvent</name>
+                                <enabled>${perfanaEnabled}</enabled>
+                                <perfanaUrl>${perfanaUrl}</perfanaUrl>
+                                <apiKey>${apiKey}</apiKey>
+                                <assertResultsEnabled>${assertResultsEnabled}</assertResultsEnabled>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
+                                <name>CommandRunnerK6ToInflux</name>
+                                <onStartTest>sh -c "./x2i . -i k6 -a ${influxUrl} -b ${influxDb} -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
+                                <name>Run k6 script</name>
+                                <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
+                                <onStartTest>k6 run --out csv=test_results.csv \
+                                    -e CONSTANT_LOAD_TIME=${constantLoadTimeInSeconds}s \
+                                    -e RAMPUP_TIME=${rampupTimeInSeconds}s \
+                                    -e START_RATE=${initialUsersPerSecond} \
+                                    -e TARGET_RATE=${targetConcurrency} \
+                                    -e TARGET_BASE_URL=http://localhost:18080 \
+                                    -e SYSTEM_UNDER_TEST=${systemUnderTest} \
+                                    -e TEST_ENVIRONMENT=${testEnvironment} \
+                                    -e TEST_RUN_ID=${testRunId} \
+                                    src/script.js
+                                </onStartTest>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
+                                <name>ActuatorSpringBootEvent</name>
+                                <tags>acme-app</tags>
+                                <actuatorBaseUrl>http://localhost:18080/actuator</actuatorBaseUrl>
+                                <actuatorEnvProperties>
+                                    java.runtime.version,
+                                    JDK_JAVA_OPTIONS
+                                </actuatorEnvProperties>
+                            </eventConfig>
+                        </eventConfigs>
+                    </eventSchedulerConfig>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>perfana-java-client</artifactId>
+                        <version>${perfana-java-client.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>test-events-springboot</artifactId>
+                        <version>${test-events-springboot.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>test-events-test-run-config-command</artifactId>
+                        <version>${test-events-test-run-config-command.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>test-events-command-runner</artifactId>
+                        <version>${test-events-command-runner.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
