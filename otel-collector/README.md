@@ -2,12 +2,12 @@
 
 Use the otel-collector to send metrics and distributed traces to Perfana cloud using mTLS.
 
-The otel-collector can also be used to scrape metrics from Prometheus endspoints, 
+The otel-collector can also be used to scrape metrics from Prometheus endpoints, 
 like the SpringBoot `/actuator/prometheus` endpoint and send them to Perfana cloud.
 
 ## Kubernetes
 
-Basic installation of otel-collector in a Kubernetes cluster.
+Basic installation of `otel-collector` in a Kubernetes cluster.
 
 This configuration receives Zipkin on port 9411 (e.g. from SpringBoot Sleuth with Zipkin) and sends them along as oltp-grpc.
 
@@ -47,8 +47,16 @@ To run the otel-collector stand alone (there might be newer versions available):
 
 ```shell
 curl -OL https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.114.0/otelcol-contrib_0.114.0_darwin_arm64.tar.gz
-tar -xzf otelcol-contrib_0.114.0_darwin_arm64.tar.gz
-cd otelcol-contrib_0.114.0_darwin_arm64
-./otelcol-contrib --config=file:otel-local-config.yml
+tar -xzfv otelcol-contrib_0.114.0_darwin_arm64.tar.gz
+./otelcol-contrib --config=file:otel-local-config.yaml
 ```
+
+The `otel-local-config.yaml` contains the basic setup. 
+
+Make sure to add the key and certificate from Perfana, change `acme` to your Perfana account name and
+enable scraping for your applications Prometheus endpoints. The example scrape is called `acme-app` and
+scrapes the SpringBoot `/actuator/prometheus` endpoint on localhost 18080. Change to match your setup.
+
+
+
 
