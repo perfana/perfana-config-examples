@@ -13,6 +13,19 @@ management.endpoint.prometheus.enabled=true
 management.metrics.export.prometheus.enabled=true
 ```
 
+Also add tags to the metrics so they can be identified in Perfana.
+These are: `system_under_test`, `test_environment` and `service`.
+
+The system under test and test environment should match the tags in the Perfana test run.
+There can be multiple services, for instance two SpringBoot services in one load test.
+
+Example:
+```
+management.metrics.tags.system_under_test=tiny-bank
+management.metrics.tags.test_environment=silver
+management.metrics.tags.service=tiny-bank-service
+```
+
 Check with:
 
     curl -sS [host:port]/actuator/prometheus
