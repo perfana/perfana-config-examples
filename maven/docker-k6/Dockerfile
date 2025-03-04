@@ -1,8 +1,8 @@
 # see latest: https://hub.docker.com/_/maven/tags?page=1&name=corretto-21
-ARG IMAGE_VERSION=3.9.6-amazoncorretto-21-al2023
+ARG IMAGE_VERSION=3.9.9-amazoncorretto-21-al2023
 
 # see latest: https://hub.docker.com/r/grafana/k6/tags
-FROM grafana/k6:0.48.0 AS k6official
+FROM grafana/k6:0.57.0 AS k6official
 FROM maven:${IMAGE_VERSION} AS builder
 
 WORKDIR /loadtest
@@ -13,10 +13,13 @@ RUN mvn -DconstantLoadTimeInSeconds=1 -DrampupTimeInSeconds=1 -DperfanaEnabled=f
 
 FROM maven:${IMAGE_VERSION}
 
+ARG TARGETOS
+ARG TARGETARCH
+
 COPY --from=k6official /usr/bin/k6 /usr/bin/k6
 
 WORKDIR /loadtest
-RUN curl -L -Ss -o /bin/x2i "https://github.com/perfana/x2i/releases/download/x2i-1.0.0/x2i-linux-amd64" \
+RUN curl -L -Ss -o /bin/x2i "https://github.com/perfana/x2i/releases/download/x2i-1.0.0/x2i-${TARGETOS}-${TARGETARCH}" \
     && chmod u+x /bin/x2i
 # the loadtest dir is overridden in the kubectl apply setup,
 # so this link is not available
